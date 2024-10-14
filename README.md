@@ -1,5 +1,5 @@
 <div align=center>
-<img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=CookieTalk&fontSize=75" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=Trello&fontSize=75" />
 </div>
 <div align=center>
 	<h3>📚 Backend Tech Stack 📚</h3>

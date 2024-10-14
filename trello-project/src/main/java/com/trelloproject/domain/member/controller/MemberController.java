@@ -9,6 +9,7 @@ import com.trelloproject.security.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,8 +22,9 @@ public class MemberController {
     private final MemberService memberService;
 
     @PutMapping("/workspaces/{workspaceId}/members/{memberId}")
+    @PreAuthorize("hasRole(T(com.trelloproject.common.enums.UserRole.Authority).ADMIN) or @memberService.hasPermissionToUpdateRole(#workspaceId, #updateRoleRequest, #authUser)")
     public ResponseDto<MemberResponse.UpdateRole> updateMemberRole(@PathVariable Long memberId, @PathVariable Long workspaceId, @Valid @RequestBody MemberRequest.UpdateRole updateRoleRequest, @AuthenticationPrincipal AuthUser authUser) {
-        Member member = memberService.updateMemberRole(memberId, workspaceId, updateRoleRequest.memberRole(), authUser);
+        Member member = memberService.updateMemberRole(memberId, updateRoleRequest.memberRole());
         return ResponseDto.of(HttpStatus.OK, "멤버 역할이 변경되었습니다.", new MemberResponse.UpdateRole(member.getId(), member.getRole()));
     }
 }

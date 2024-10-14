@@ -21,8 +21,7 @@ public class Workspace {
     String description;
 
     @Builder
-    public Workspace(Long id, String name, String description) {
-        this.id = id;
+    public Workspace(String name, String description) {
         this.name = name;
         this.description = description;
     }

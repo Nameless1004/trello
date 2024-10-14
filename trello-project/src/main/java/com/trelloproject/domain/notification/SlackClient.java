@@ -13,10 +13,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class SlackClient {
 
-    @Value("${NOTIFICATION_SLACK_WEBHOOK_URL}")
+    @Value("${DEFAULT_SLACK_WEBHOOK_URL}")
     private String slackAlertWebhookUrl;
 
     private final ObjectMapper mapper = new ObjectMapper();
+
+    public void notify(String webhookUrl, String payload)  {
+        try {
+            Slack slack = Slack.getInstance();
+
+            Map<String, String> map = new HashMap<>();
+            map.put("text", payload);
+
+            WebhookResponse response = slack.send(webhookUrl,
+                mapper.writeValueAsString(map));
+            SlackResponse slackResponse = new SlackResponse(response.getCode(),
+                response.getMessage(),
+                response.getBody());
+            String json = mapper.writeValueAsString(slackResponse);
+            log.error("[ slack notify result ] {}", json);
+        } catch (Exception e) {
+            log.error("Slack Message Send Failed!!");
+        }
+    }
 
     public void notify(String payload)  {
         try {

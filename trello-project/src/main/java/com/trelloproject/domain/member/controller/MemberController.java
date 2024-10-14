@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final MemberService memberService;
 
-    @PutMapping("/workspace/{workspaceId}/member/{memberId}")
+    @PutMapping("/workspaces/{workspaceId}/members/{memberId}")
     public ResponseDto<MemberResponse.UpdateRole> updateMemberRole(@PathVariable Long memberId, @PathVariable Long workspaceId, @Valid @RequestBody MemberRequest.UpdateRole updateRoleRequest, @AuthenticationPrincipal AuthUser authUser) {
         Member member = memberService.updateMemberRole(memberId, workspaceId, updateRoleRequest.memberRole(), authUser);
         return ResponseDto.of(HttpStatus.OK, "멤버 역할이 변경되었습니다.", new MemberResponse.UpdateRole(member.getId(), member.getRole()));

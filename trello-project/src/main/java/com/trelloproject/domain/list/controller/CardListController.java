@@ -24,28 +24,53 @@ public class CardListController {
 
     private final CardListService cardListService;
 
-    @GetMapping("/api/boards/{boardId}/lists")
-    public ResponseEntity<ResponseDto<List<ListResponse.Info>>> getLists(@PathVariable("boardId") long boardId){
-        return ResponseDto.toEntity(cardListService.getLists(boardId));
+    @GetMapping("/api/workspaces/{workspaceId}/boards/{boardId}/lists")
+    public ResponseEntity<ResponseDto<List<ListResponse.Info>>> getLists(
+        @AuthenticationPrincipal AuthUser authUser,
+        @PathVariable("workspaceId") long workspaceId,
+        @PathVariable("boardId") long boardId) {
+
+        return ResponseDto.toEntity(cardListService.getLists(workspaceId, authUser, boardId));
     }
 
-    @PostMapping("/api/boards/{boardId}/lists")
-    public void createList(@PathVariable("boardId") long boardId, @AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody ListRequest.Create request){
-        cardListService.createList(authUser, boardId, request);
+    @PostMapping("/api/workspaces/{workspaceId}/boards/{boardId}/lists")
+    public void createList(
+        @AuthenticationPrincipal AuthUser authUser,
+        @PathVariable("workspaceId") long workspaceId,
+        @PathVariable("boardId") long boardId,
+        @Valid @RequestBody ListRequest.Create request) {
+
+        cardListService.createList(authUser, workspaceId, boardId, request);
     }
 
-    @PatchMapping("/api/boards/{boardId}/lists/{listId}")
-    public ResponseEntity<ResponseDto<ListResponse.Info>> updateList(@PathVariable("boardId") long boardId, @PathVariable("listId") long listId, @AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody ListRequest.Update request){
-        return ResponseDto.toEntity(cardListService.updateList(authUser, boardId, listId, request));
+    @PatchMapping("/api/workspaces/{workspaceId}/boards/{boardId}/lists/{listId}")
+    public ResponseEntity<ResponseDto<ListResponse.Info>> updateList(
+        @AuthenticationPrincipal AuthUser authUser,
+        @PathVariable("workspaceId") long workspaceId,
+        @PathVariable("boardId") long boardId,
+        @PathVariable("listId") long listId,
+        @Valid @RequestBody ListRequest.Update request) {
+
+        return ResponseDto.toEntity(cardListService.updateList(authUser, workspaceId, boardId, listId, request));
     }
 
-    @PatchMapping("/api/boards/{boardId}/lists/move")
-    public ResponseEntity<ResponseDto<Void>> moveList(@PathVariable("boardId") long boardId, @AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody ListRequest.Move request){
-        return ResponseDto.toEntity(cardListService.moveList(authUser, boardId, request));
+    @PatchMapping("/api/workspaces/{workspaceId}/boards/{boardId}/lists/move")
+    public ResponseEntity<ResponseDto<Void>> moveList(
+        @AuthenticationPrincipal AuthUser authUser,
+        @PathVariable("workspaceId") long workspaceId,
+        @PathVariable("boardId") long boardId,
+        @Valid @RequestBody ListRequest.Move request) {
+
+        return ResponseDto.toEntity(cardListService.moveList(authUser,workspaceId, boardId, request));
     }
 
-    @DeleteMapping("/api/boards/{boardId}/lists/{listId}")
-    public ResponseEntity<ResponseDto<Void>> deleteList(@PathVariable("boardId") long boardId, @PathVariable("listId") long listId, @AuthenticationPrincipal AuthUser authUser){
-        return ResponseDto.toEntity(cardListService.deleteList(authUser, boardId, listId));
+    @DeleteMapping("/api/workspaces/{workspaceId}/boards/{boardId}/lists/{listId}")
+    public ResponseEntity<ResponseDto<Void>> deleteList(
+        @AuthenticationPrincipal AuthUser authUser,
+        @PathVariable("workspaceId") long workspaceId,
+        @PathVariable("boardId") long boardId,
+        @PathVariable("listId") long listId) {
+
+        return ResponseDto.toEntity(cardListService.deleteList(authUser, workspaceId, boardId, listId));
     }
 }

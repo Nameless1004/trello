@@ -1,5 +1,6 @@
 package com.trelloproject.domain.board.entity;
 
+import com.trelloproject.domain.attachment.entity.Attachment;
 import com.trelloproject.domain.list.entity.CardList;
 import com.trelloproject.domain.workspace.entity.Workspace;
 import jakarta.persistence.*;
@@ -31,6 +32,13 @@ public class Board {
     Attachment attachment;
 
     public Board(String title, String bgColor) {
+        this.title = title;
+        this.bgColor = bgColor;
+    }
+
+    // test하고 지우기
+    public Board(Long id, String title, String bgColor) {
+        this.id = id;
         this.title = title;
         this.bgColor = bgColor;
     }

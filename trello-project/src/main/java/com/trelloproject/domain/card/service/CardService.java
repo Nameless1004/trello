@@ -88,8 +88,9 @@ public class CardService {
         cardListRepository.findById(listId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 card list ID 입니다."));
 
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 card ID 입니다."));
+        if (!cardRepository.existsById(cardId)) {
+            throw new IllegalArgumentException("잘못된 cardId 입니다.");
+        }
 
         cardRepository.deleteById(cardId);
         return ResponseDto.of(HttpStatus.NO_CONTENT, "카드가 성공적으로 삭제되었습니다.");

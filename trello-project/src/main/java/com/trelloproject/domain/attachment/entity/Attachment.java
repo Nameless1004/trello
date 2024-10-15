@@ -23,8 +23,7 @@ public class Attachment {
         this.card = card;
     }
 
-    public Attachment(Attachment attachment) {
-        this.s3Url = attachment.s3Url;
-        this.card = attachment.card;
+    public void saveImage(String s3Url) {
+        this.s3Url = s3Url;
     }
 }

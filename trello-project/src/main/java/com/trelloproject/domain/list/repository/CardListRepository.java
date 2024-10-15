@@ -27,6 +27,4 @@ public interface CardListRepository extends JpaRepository<CardList, Long> {
     @Modifying
     @Query("UPDATE CardList cl SET cl.orderIndex = cl.orderIndex + :dir WHERE cl.id IN :cardListIds")
     void updateOrderInIds(@Param("cardListIds") List<Long> cardListIds, @Param("dir") int dir);
-
-    Optional<CardList> findByIdAndBoardId(Long cardListId, Long boardId);
 }

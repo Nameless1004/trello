@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/boards/{boardId}/lists/{listId}/cards")
+@RequestMapping("/api/lists/{listId}/cards")
 @RequiredArgsConstructor
 public class CardController {
     private final CardService cardService;
@@ -17,41 +17,33 @@ public class CardController {
     // 카드 생성
     @PostMapping
     public ResponseEntity<ResponseDto<CardResponse>> createCard(
-            @PathVariable Long boardId,
             @PathVariable Long listId,
             @RequestBody CardRequest request) {
-        // 서비스 계층에 보드 ID와 리스트 ID를 전달
-        return cardService.createOrUpdateCard(boardId, listId, request).toEntity();
+        return cardService.createOrUpdateCard(listId, request).toEntity();
     }
 
     // 카드 조회
     @GetMapping("/{cardId}")
     public ResponseEntity<ResponseDto<CardResponse>> getCardDetails(
-            @PathVariable Long boardId,
             @PathVariable Long listId,
             @PathVariable Long cardId) {
-        // 서비스 계층에 보드 ID와 리스트 ID를 전달
-        return cardService.getCardDetails(boardId, listId, cardId).toEntity();
+        return cardService.getCardDetails(listId, cardId).toEntity();
     }
 
     // 카드 수정
     @PatchMapping("/{cardId}")
     public ResponseEntity<ResponseDto<CardResponse>> updateCard(
-            @PathVariable Long boardId,
             @PathVariable Long listId,
             @PathVariable Long cardId,
             @RequestBody CardRequest request) {
-        // 서비스 계층에 보드 ID와 리스트 ID를 전달
-        return cardService.updateCard(boardId, listId, cardId, request).toEntity();
+        return cardService.updateCard(listId, cardId, request).toEntity();
     }
 
     // 카드 삭제
     @DeleteMapping("/{cardId}")
     public ResponseEntity<ResponseDto<Void>> deleteCard(
-            @PathVariable Long boardId,
             @PathVariable Long listId,
             @PathVariable Long cardId) {
-        // 서비스 계층에 보드 ID와 리스트 ID를 전달
-        return cardService.deleteCard(boardId, listId, cardId).toEntity();
+        return cardService.deleteCard(listId, cardId).toEntity();
     }
 }

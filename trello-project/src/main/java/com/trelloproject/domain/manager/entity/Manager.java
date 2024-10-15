@@ -26,24 +26,4 @@ public class Manager {
 
     private String name;
     private String role;
-
-    public Manager(String name, String role, Member member) {
-        this.name = name;
-        this.role = role;
-        this.member = member;
-    }
-
-    public Manager(Long id, String name, String role, Member member) {
-        this.id = id;
-        this.name = name;
-        this.role = role;
-        this.member = member;
-    }
-
-    // test하고 지우기
-    public Manager(Long id, String name, String role) {
-        this.id = id;
-        this.name = name;
-        this.role = role;
-    }
 }

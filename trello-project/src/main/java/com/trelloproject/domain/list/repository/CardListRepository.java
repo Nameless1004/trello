@@ -4,6 +4,8 @@ import com.trelloproject.domain.board.entity.Board;
 import com.trelloproject.domain.list.entity.CardList;
 import jakarta.persistence.LockModeType;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -25,4 +27,6 @@ public interface CardListRepository extends JpaRepository<CardList, Long> {
     @Modifying
     @Query("UPDATE CardList cl SET cl.orderIndex = cl.orderIndex + :dir WHERE cl.id IN :cardListIds")
     void updateOrderInIds(@Param("cardListIds") List<Long> cardListIds, @Param("dir") int dir);
+
+    Optional<CardList> findByIdAndBoardId(Long cardListId, Long boardId);
 }

@@ -1,5 +1,6 @@
 package com.trelloproject.domain.board.entity;
 
+import com.trelloproject.domain.attachment.entity.Attachment;
 import com.trelloproject.domain.list.entity.CardList;
 import com.trelloproject.domain.workspace.entity.Workspace;
 import jakarta.persistence.*;

@@ -4,23 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a4a41258-f9ce-4403-a41e-86308d940689" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/board/controller/BoardController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/board/dto/BoardRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/board/dto/BoardResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/board/repository/BoardRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/board/service/BoardService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trello-project/src/test/java/com/templateproject/domain/board/BoardTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/board/entity/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/board/entity/Board.java" afterDir="false" />
+    <list default="true" id="186aa5c2-2ac2-4d76-a549-3ba49af5515c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/trello-project.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/member/dto/MemberRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/member/dto/MemberResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/member/controller/MemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/trello-project/src/main/java/com/trelloproject/domain/member/controller/MemberController.java" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="CodeInsightWorkspaceSettings">
-    <option name="optimizeImportsOnTheFly" value="true" />
-  </component>
+
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$/trello-project">
       <ProjectState />
@@ -39,6 +40,11 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="trello-project" type="f1a62948:ProjectNode" />
               </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="trello-project" type="f1a62948:ProjectNode" />
+                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
+              </path>
             </expand>
             <select />
           </tree_state>
@@ -49,89 +55,31 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Enum" />
       </list>
     </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;tiyu25&quot;
-  }
-}</component>
-  <component name="GitToolBoxStore">
-    <option name="recentBranches">
-      <RecentBranches>
-        <option name="branchesForRepo">
-          <list>
-            <RecentBranchesForRepo>
-              <option name="branches">
-                <list>
-                  <RecentBranch>
-                    <option name="branchName" value="feature/3-보드board-기능-구현" />
-                    <option name="lastUsedInstant" value="1728886500" />
-                  </RecentBranch>
-                  <RecentBranch>
-                    <option name="branchName" value="main" />
-                    <option name="lastUsedInstant" value="1728886499" />
-                  </RecentBranch>
-                </list>
-              </option>
-              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
-            </RecentBranchesForRepo>
-          </list>
-        </option>
-      </RecentBranches>
-    </option>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
   </component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Nameless1004/trello.git&quot;,
-    &quot;accountId&quot;: &quot;b8fbff71-dd88-4187-9a8b-344b3fa351dc&quot;
-  }
-}</component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 2
+  &quot;associatedIndex&quot;: 7
 }</component>
-  <component name="ProjectId" id="2nPMucyRjgRwsWNeJhVspqtvcVO" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+  <component name="ProjectId" id="2nQ2txc8MuqC5SCbUhMxSoBkFtr" />
+  <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Gradle.Build trello-project.executor": "Run",
-    "Gradle.trello-project [clean].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "Spring Boot.TrelloProjectApplication.executor": "Run",
-    "git-widget-placeholder": "feature/3-보드board-기능-구현",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/yutaei/Desktop/sparta/trello",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.import",
-    "vue.rearranger.settings.migration": "true"
-  },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
-    ]
-  }
-}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/trello-project" />
@@ -160,76 +108,19 @@
       <RunAsTest>false</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="TrelloProjectApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <module name="trello-project.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.trelloproject.TrelloProjectApplication" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.trelloproject.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <list>
-      <item itemvalue="Gradle.trello-project [clean]" />
-      <item itemvalue="Spring Boot.TrelloProjectApplication" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Spring Boot.TrelloProjectApplication" />
         <item itemvalue="Gradle.trello-project [clean]" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-b114ca120d71-intellij.indexing.shared.core-IU-242.20224.300" />
-        <option value="bundled-js-predefined-d6986cc7102b-410509235cf1-JavaScript-IU-242.20224.300" />
-      </set>
-    </attachedChunks>
-  </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
-  <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="a4a41258-f9ce-4403-a41e-86308d940689" name="Changes" comment="" />
-      <created>1728870482463</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1728870482463</updated>
-      <workItem from="1728870484443" duration="12129000" />
-      <workItem from="1728904195292" duration="255000" />
-      <workItem from="1728914892575" duration="1000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="feature/3-보드board-기능-구현" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
 </project>

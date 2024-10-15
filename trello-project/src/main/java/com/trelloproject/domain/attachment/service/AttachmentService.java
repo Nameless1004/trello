@@ -1,12 +1,17 @@
 package com.trelloproject.domain.attachment.service;
 
 import com.trelloproject.common.dto.ResponseDto;
+import com.trelloproject.common.enums.MemberRole;
+import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.common.service.S3Service;
 import com.trelloproject.domain.attachment.dto.AttachmentResponse;
 import com.trelloproject.domain.attachment.entity.Attachment;
 import com.trelloproject.domain.attachment.repository.AttachmentRepository;
 import com.trelloproject.domain.card.entity.Card;
 import com.trelloproject.domain.card.repository.CardRepository;
+import com.trelloproject.domain.member.entity.Member;
+import com.trelloproject.domain.member.repository.MemberRepository;
+import com.trelloproject.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +30,7 @@ public class AttachmentService {
     private final CardRepository cardRepository;
     private final S3Service s3Service;
     private final AttachmentRepository attachmentRepository;
+    private final MemberRepository memberRepository;
 
     // 지원되는 파일 형식과 크기 제한
     private static final List<String> SUPPORTED_FILE_TYPES = Arrays.asList("image/jpeg", "image/png", "application/pdf", "text/csv");
@@ -32,7 +38,14 @@ public class AttachmentService {
 
     // 파일 저장
     @Transactional
-    public ResponseDto<AttachmentResponse> saveFile(Long cardId, MultipartFile file) throws IOException {
+    public ResponseDto<AttachmentResponse> saveFile(AuthUser authUser, Long cardId, MultipartFile file) throws IOException {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if(member.getRole() == MemberRole.READ_ONLY) {
+            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
+        }
+
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
 
@@ -54,9 +67,29 @@ public class AttachmentService {
         return ResponseDto.of(HttpStatus.OK, "파일이 성공적으로 업로드되었습니다.", response);
     }
 
+    // 첨부파일 조회
+    public ResponseDto<List<AttachmentResponse>> getFiles(Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
+
+        List<Attachment> attachments = attachmentRepository.findAllByCard(card);
+        List<AttachmentResponse> response = attachments.stream()
+                .map(AttachmentResponse::new)
+                .collect(Collectors.toList());
+
+        return ResponseDto.of(HttpStatus.OK, "첨부파일 조회가 성공되었습니다.", response);
+    }
+
     // 첨부파일 삭제
     @Transactional
-    public ResponseDto<Void> deleteFile(Long cardId, Long fileId) {
+    public ResponseDto<Void> deleteFile(AuthUser authUser, Long cardId, Long fileId) {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if(member.getRole() == MemberRole.READ_ONLY) {
+            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
+        }
+
         if (!cardRepository.existsById(cardId)) {
             throw new IllegalArgumentException("잘못된 cardId 입니다.");
         }
@@ -66,18 +99,5 @@ public class AttachmentService {
         attachmentRepository.delete(attachment);
 
         return ResponseDto.of(HttpStatus.NO_CONTENT, "파일이 성공적으로 삭제되었습니다.");
-    }
-
-    // 첨부파일 조회
-    public ResponseDto<List<AttachmentResponse>> getFiles(Long cardId) {
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
-
-        List<Attachment> attachments = attachmentRepository.findByCard(card);
-        List<AttachmentResponse> response = attachments.stream()
-                .map(AttachmentResponse::new)
-                .collect(Collectors.toList());
-
-        return ResponseDto.of(HttpStatus.OK, "첨부파일 조회가 성공되었습니다.", response);
     }
 }

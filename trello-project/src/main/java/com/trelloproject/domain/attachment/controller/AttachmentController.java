@@ -3,8 +3,10 @@ package com.trelloproject.domain.attachment.controller;
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.domain.attachment.dto.AttachmentResponse;
 import com.trelloproject.domain.attachment.service.AttachmentService;
+import com.trelloproject.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,10 +21,10 @@ public class AttachmentController {
 
     // 첨부파일 추가
     @PutMapping
-    public ResponseEntity<ResponseDto<AttachmentResponse>> saveFiles(
+    public ResponseEntity<ResponseDto<AttachmentResponse>> saveFiles(@AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long cardId,
             @RequestPart(name = "file") MultipartFile file) throws IOException {
-        return attachmentService.saveFile(cardId, file).toEntity();
+        return attachmentService.saveFile(authUser, cardId, file).toEntity();
     }
 
     // 첨부파일 조회
@@ -34,9 +36,9 @@ public class AttachmentController {
 
     // 첨부파일 삭제
     @DeleteMapping("/{fileId}")
-    public ResponseEntity<ResponseDto<Void>> deleteFile(
+    public ResponseEntity<ResponseDto<Void>> deleteFile(@AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long cardId,
             @PathVariable Long fileId) {
-        return attachmentService.deleteFile(cardId, fileId).toEntity();
+        return attachmentService.deleteFile(authUser, cardId, fileId).toEntity();
     }
 }

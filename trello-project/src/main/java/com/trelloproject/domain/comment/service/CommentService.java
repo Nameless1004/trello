@@ -2,13 +2,16 @@ package com.trelloproject.domain.comment.service;
 
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
+import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.domain.card.entity.Card;
 import com.trelloproject.domain.card.repository.CardRepository;
+import com.trelloproject.domain.comment.dto.CommentRequest;
 import com.trelloproject.domain.comment.dto.CommentResponse;
 import com.trelloproject.domain.comment.entity.Comment;
 import com.trelloproject.domain.comment.repository.CommentRepository;
 import com.trelloproject.domain.member.entity.Member;
 import com.trelloproject.domain.member.repository.MemberRepository;
+import com.trelloproject.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,20 +27,24 @@ public class CommentService {
 
     // 댓글 작성
     @Transactional
-    public ResponseDto<CommentResponse> createComment(Long cardId, Long memberId, String description) {
+    public ResponseDto<CommentResponse> createComment(AuthUser authUser, Long cardId, CommentRequest commentRequest) {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if(member.getRole() == MemberRole.READ_ONLY) {
+            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
+        }
+
         // 카드 존재 확인
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
 
-        // 읽기 전용 역할 확인
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 memberId 입니다."));
         if (member.getRole().equals(MemberRole.READ_ONLY)) {
             return ResponseDto.of(HttpStatus.FORBIDDEN, "댓글을 작성할 권한이 없습니다.");
         }
 
         // 댓글 생성
-        Comment comment = new Comment(card, member, description);
+        Comment comment = new Comment(card, member, commentRequest.getDescription());
         Comment savedComment = commentRepository.save(comment);
 
         return ResponseDto.of(HttpStatus.CREATED, "댓글이 성공적으로 생성되었습니다.",new CommentResponse(savedComment));
@@ -45,7 +52,14 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional
-    public ResponseDto<CommentResponse> updateComment(Long cardId, Long commentId, Long memberId, String newDescription) {
+    public ResponseDto<CommentResponse> updateComment(AuthUser authUser, Long cardId, Long commentId, CommentRequest commentRequest) {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if(member.getRole() == MemberRole.READ_ONLY) {
+            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
+        }
+
         // 카드 존재 확인
         cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
@@ -55,12 +69,12 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 commentId 입니다."));
 
         // 댓글 작성자 확인
-        if (!comment.getMember().getId().equals(memberId)) {
+        if (!comment.getMember().getId().equals(member.getId())) {
             return ResponseDto.of(HttpStatus.FORBIDDEN, "댓글을 수정할 권한이 없습니다.");
         }
 
         // 댓글 수정
-        comment.updateComment(newDescription);
+        comment.updateComment(commentRequest.getDescription());
         Comment updatedComment = commentRepository.save(comment);
 
         return ResponseDto.of(HttpStatus.OK, "댓글을 성공적으로 수정되었습니다.", new CommentResponse(updatedComment));
@@ -68,7 +82,14 @@ public class CommentService {
 
     // 댓글 삭제
     @Transactional
-    public ResponseDto<Void> deleteComment(Long cardId, Long commentId, Long memberId) {
+    public ResponseDto<Void> deleteComment(AuthUser authUser, Long cardId, Long commentId) {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if(member.getRole() == MemberRole.READ_ONLY) {
+            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
+        }
+
         // 카드 존재 확인
         cardRepository.findById(cardId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
@@ -78,7 +99,7 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 commentId 입니다."));
 
         // 댓글 작성자 확인
-        if (!comment.getMember().getId().equals(memberId)) {
+        if (!comment.getMember().getId().equals(member.getId())) {
             return ResponseDto.of(HttpStatus.FORBIDDEN, "댓글을 삭제할 권한이 없습니다.");
         }
 

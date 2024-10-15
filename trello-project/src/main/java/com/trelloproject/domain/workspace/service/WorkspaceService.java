@@ -25,7 +25,7 @@ public class WorkspaceService {
 
     @Transactional
     public Workspace createWorkspace(String name, String description) {
-        Workspace workspace = Workspace.builder().name(name).description(description).members(List.of()).build();
+        Workspace workspace = Workspace.builder().name(name).description(description).members(List.of()).deleted(false).build();
         return workspaceRepository.save(workspace);
     }
 
@@ -57,6 +57,11 @@ public class WorkspaceService {
             throw new InvalidRequestException("해당하는 Member를 찾을 수 없습니다.");
 
         memberRepository.deleteById(memberId);
+    }
+
+    @Transactional
+    public void deleteWorkspace(Long workspaceId) {
+        workspaceRepository.deleteById(workspaceId);
     }
 
     // 유저 역할 ADMIN이 아닌 유저가 멤버 추가하려 할 때
@@ -91,5 +96,9 @@ public class WorkspaceService {
     // 워크스페이스 가져올 수 있는지 권한 확인
     public boolean hasPermissionToGetWorkspace(Long workspaceId, AuthUser authUser) {
         return memberRepository.existsByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId());
+    }
+
+    public boolean hasPermissionToDeleteWorkspace(Long workspaceId, AuthUser authUser) {
+        return memberRepository.existsByWorkspace_IdAndUser_IdAndRole(workspaceId, authUser.getUserId(), MemberRole.WORKSPACE);
     }
 }

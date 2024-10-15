@@ -4,7 +4,7 @@ import com.trelloproject.domain.auth.dto.AuthResponse.DuplicateCheck;
 import com.trelloproject.domain.auth.dto.AuthResponse.Reissue;
 import com.trelloproject.domain.auth.dto.AuthResponse.Login;
 import com.trelloproject.domain.auth.dto.AuthResponse.Signup;
-import com.trelloproject.domain.user.entitiy.User;
+import com.trelloproject.domain.user.entity.User;
 
 public sealed interface AuthResponse permits Signup, Login, Reissue, DuplicateCheck {
 

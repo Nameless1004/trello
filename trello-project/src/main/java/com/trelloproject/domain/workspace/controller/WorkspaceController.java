@@ -56,4 +56,11 @@ public class WorkspaceController {
         workspaceService.deleteMember(workspaceId, memberId);
         return ResponseDto.of(HttpStatus.NO_CONTENT, "멤버가 삭제되었습니다.");
     }
+
+    @DeleteMapping("/workspaces/{workspaceId}")
+    @PreAuthorize("hasRole(T(com.trelloproject.common.enums.UserRole.Authority).ADMIN) or @workspaceService.hasPermissionToDeleteWorkspace(#workspaceId, #authUser)")
+    public ResponseDto deleteWorkspace(@PathVariable Long workspaceId, @AuthenticationPrincipal AuthUser authUser) {
+        workspaceService.deleteWorkspace(workspaceId);
+        return ResponseDto.of(HttpStatus.NO_CONTENT, "워크스페이스가 삭제되었습니다.");
+    }
 }

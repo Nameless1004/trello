@@ -29,18 +29,11 @@ public class CardList {
     @JoinColumn(name="board_id")
     private Board board;
 
-//    @OneToMany(mappedBy="~~")
-//    private List<Card> cards = new ArrayList<>();
+    @OneToMany(mappedBy="cardList", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Card> cards = new ArrayList<>();
 
     @Builder
     public CardList(String title, int order) {
-        this.title = title;
-        this.orderIndex = order;
-    }
-
-    // test하고 지우기
-    public CardList(Long id, String title, int order) {
-        this.id = id;
         this.title = title;
         this.orderIndex = order;
     }

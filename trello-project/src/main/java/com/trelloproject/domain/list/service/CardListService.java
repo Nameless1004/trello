@@ -2,6 +2,7 @@ package com.trelloproject.domain.list.service;
 
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
+import com.trelloproject.common.exceptions.AccessDeniedException;
 import com.trelloproject.common.exceptions.BoardNotFoundException;
 import com.trelloproject.common.exceptions.ListNotFoundException;
 import com.trelloproject.common.exceptions.MemberNotFoundException;
@@ -20,7 +21,6 @@ import com.trelloproject.security.AuthUser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +35,17 @@ public class CardListService {
 
     /**
      * 리스트 다건 조회
+     *
+     * @param workspaceId
      * @param boardId
      * @return
      */
-    public ResponseDto<List<ListResponse.Info>> getLists(long boardId) {
+    public ResponseDto<List<ListResponse.Info>> getLists(long workspaceId, AuthUser authUser, long boardId) {
+
+        if(memberRepository.existsByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())){
+            throw new AccessDeniedException("접근 권한이 없습니다.");
+        }
+
         Board board = boardRepository.findById(boardId)
             .orElseThrow(BoardNotFoundException::new);
 
@@ -53,7 +60,12 @@ public class CardListService {
     /**
      * 리스트 생성
      */
-    public ResponseDto<Long> createList(AuthUser authUser, long boardId, Create request) {
+    public ResponseDto<Long> createList(AuthUser authUser, long workspaceId, long boardId, Create request) {
+
+        if(memberRepository.existsByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())){
+            throw new AccessDeniedException("접근 권한이 없습니다.");
+        }
+
         Board board = boardRepository.findById(boardId)
             .orElseThrow(BoardNotFoundException::new);
 
@@ -78,16 +90,17 @@ public class CardListService {
     /**
      * 리스트 수정
      */
-    public ResponseDto<ListResponse.Info> updateList(AuthUser authUser, long boardId, long listId, Update request) {
-        Board board = boardRepository.findById(boardId)
-            .orElseThrow(BoardNotFoundException::new);
+    public ResponseDto<ListResponse.Info> updateList(AuthUser authUser, long workspaceId, long boardId, long listId, Update request) {
 
-        Member member = memberRepository.findByUserId(authUser.getUserId())
-            .orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
+            .orElseThrow(() -> new AccessDeniedException("접근 권한이 없습니다."));
 
         if(member.getRole() == MemberRole.READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
         }
+
+        Board board = boardRepository.findById(boardId)
+            .orElseThrow(BoardNotFoundException::new);
 
         CardList cardList = cardListRepository.findById(listId)
             .orElseThrow(ListNotFoundException::new);
@@ -99,17 +112,17 @@ public class CardListService {
     /**
      * 리스트 위치 변경
      */
-    public ResponseDto<Void> moveList(AuthUser authUser, long boardId, Move request) {
+    public ResponseDto<Void> moveList(AuthUser authUser, long workspaceId, long boardId, Move request) {
 
-        Board board = boardRepository.findById(boardId)
-            .orElseThrow(BoardNotFoundException::new);
-
-        Member member = memberRepository.findByUserId(authUser.getUserId())
-            .orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
+            .orElseThrow(() -> new AccessDeniedException("접근 권한이 없습니다."));
 
         if(member.getRole() == MemberRole.READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
         }
+
+        Board board = boardRepository.findById(boardId)
+            .orElseThrow(BoardNotFoundException::new);
 
         // 보드에 있는 list 가져오기
         List<CardList> find = cardListRepository.findAllByBoardOrderByOrderWithWriteLock(board);
@@ -149,16 +162,17 @@ public class CardListService {
     /**
      * 리스트 삭제
      */
-    public ResponseDto<Void> deleteList(AuthUser authUser, long boardId, long listId) {
-        Board board = boardRepository.findById(boardId)
-            .orElseThrow(BoardNotFoundException::new);
+    public ResponseDto<Void> deleteList(AuthUser authUser, long workspaceId, long boardId, long listId) {
 
-        Member member = memberRepository.findByUserId(authUser.getUserId())
-            .orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
+            .orElseThrow(() -> new AccessDeniedException("접근 권한이 없습니다."));
 
         if(member.getRole() == MemberRole.READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
         }
+
+        Board board = boardRepository.findById(boardId)
+            .orElseThrow(BoardNotFoundException::new);
 
         List<CardList> find = cardListRepository.findAllByBoardOrderByOrderWithWriteLock(board);
 

@@ -28,17 +28,15 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
     List<CardList> lists = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    Attachment attachment;
+//    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    Attachment attachment;
 
     public Board(String title, String bgColor) {
         this.title = title;
         this.bgColor = bgColor;
     }
 
-    // test하고 지우기
-    public Board(Long id, String title, String bgColor) {
-        this.id = id;
+    public void update(String title, String bgColor) {
         this.title = title;
         this.bgColor = bgColor;
     }

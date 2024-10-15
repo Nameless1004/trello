@@ -12,15 +12,15 @@ import lombok.*;
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @JoinColumn(nullable = false)
     @ManyToOne
-    Workspace workspace;
+    private Workspace workspace;
 
     @JoinColumn(nullable = false)
     @ManyToOne
-    User user;
+    private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

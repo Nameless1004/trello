@@ -24,5 +24,17 @@ public class Comment {
     private Member member;  // 댓글 작성자
 
     private String description;
+
+    public Comment(Card card, Member member, String description) {
+        this.card = card;
+        this.member = member;
+        this.description = description;
+    }
+
+    public Comment(Comment comment) {
+        this.card = comment.getCard();
+        this.member = comment.getMember();
+        this.description = comment.getDescription();
+    }
 }
 

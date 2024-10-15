@@ -2,6 +2,7 @@ package com.trelloproject.domain.attachment.service;
 
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
+import com.trelloproject.common.exceptions.AccessDeniedException;
 import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.common.service.S3Service;
 import com.trelloproject.domain.attachment.dto.AttachmentResponse;
@@ -43,7 +44,7 @@ public class AttachmentService {
                 .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
+            throw new AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
         }
 
         Card card = cardRepository.findById(cardId)
@@ -87,7 +88,7 @@ public class AttachmentService {
                 .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
+            throw new AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
         }
 
         if (!cardRepository.existsById(cardId)) {

@@ -2,6 +2,7 @@ package com.trelloproject.domain.comment.service;
 
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
+import com.trelloproject.common.exceptions.AccessDeniedException;
 import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.domain.card.entity.Card;
 import com.trelloproject.domain.card.repository.CardRepository;
@@ -32,7 +33,7 @@ public class CommentService {
                 .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
+            throw new AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
         }
 
         // 카드 존재 확인
@@ -57,7 +58,7 @@ public class CommentService {
                 .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
+            throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
         }
 
         // 카드 존재 확인
@@ -87,7 +88,7 @@ public class CommentService {
                 .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
+            throw new AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
         }
 
         // 카드 존재 확인

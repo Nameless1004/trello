@@ -40,7 +40,7 @@ public class CardService {
                 .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
+            throw new AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
         }
 
         List<Manager> managers = request.getManagers().stream()
@@ -78,7 +78,7 @@ public class CardService {
                 .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
+            throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
         }
 
         cardListRepository.findById(listId)
@@ -108,7 +108,7 @@ public class CardService {
                 .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new org.springframework.security.access.AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
+            throw new AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
         }
 
         cardListRepository.findById(listId)

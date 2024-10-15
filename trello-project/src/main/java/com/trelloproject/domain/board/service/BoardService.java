@@ -7,13 +7,12 @@ import com.trelloproject.domain.board.dto.BoardRequest;
 import com.trelloproject.domain.board.dto.BoardResponse;
 import com.trelloproject.domain.board.entity.Board;
 import com.trelloproject.domain.board.repository.BoardRepository;
-import com.trelloproject.domain.card.entity.Card;
-import com.trelloproject.domain.list.entity.CardList;
+import com.trelloproject.domain.card.repository.CardRepository;
 import com.trelloproject.domain.list.repository.CardListRepository;
 import com.trelloproject.domain.member.entity.Member;
 import com.trelloproject.domain.member.repository.MemberRepository;
-import com.trelloproject.domain.user.repository.UserRepository;
 import com.trelloproject.domain.workspace.entity.Workspace;
+import com.trelloproject.domain.workspace.repository.WorkspaceRepository;
 import com.trelloproject.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,9 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +29,8 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final CardListRepository cardListRepository;
     private final MemberRepository memberRepository;
+    private final WorkspaceRepository workspaceRepository;
+    private final CardRepository cardRepository;
 
     /**
      * 보드 생성
@@ -141,10 +140,10 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(BoardNotFoundException::new);
 
-        List<CardList> cardList = cardListRepository.findByBoardId(boardId);
-        List<Card> card = cardRepository.findByBoardId(boardId);
+//        List<CardList> cardList = cardListRepository.findByBoardId(boardId);
+//        List<Card> card = cardRepository.findByBoardId(boardId);
 
-        return ResponseDto.of(HttpStatus.OK, "보드 단건 조회에 성공했습니다.", new BoardResponse.DetailBoard(board.getId(), board.getTitle(), board.getBgColor(), cardList, card));
+        return ResponseDto.of(HttpStatus.OK, "보드 단건 조회에 성공했습니다.");//, new BoardResponse.DetailBoard(board.getId(), board.getTitle(), board.getBgColor(), cardList, card));
     }
 
     /**

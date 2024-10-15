@@ -2,7 +2,9 @@ package com.trelloproject.domain.card.service;
 
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.ManagerRole;
+import com.trelloproject.common.enums.MemberRole;
 import com.trelloproject.common.exceptions.AccessDeniedException;
+import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.domain.card.dto.CardRequest;
 import com.trelloproject.domain.card.dto.CardResponse;
 import com.trelloproject.domain.card.entity.Card;
@@ -11,6 +13,9 @@ import com.trelloproject.domain.list.entity.CardList;
 import com.trelloproject.domain.list.repository.CardListRepository;
 import com.trelloproject.domain.manager.entity.Manager;
 import com.trelloproject.domain.manager.repository.ManagerRepository;
+import com.trelloproject.domain.member.entity.Member;
+import com.trelloproject.domain.member.repository.MemberRepository;
+import com.trelloproject.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,10 +32,17 @@ public class CardService {
     private final CardRepository cardRepository;
     private final ManagerRepository managerRepository;
     private final CardListRepository cardListRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
-    public ResponseDto<CardResponse> createOrUpdateCard(Long listId, CardRequest request) {
-        // ManagerRequest 리스트에서 Manager 엔티티로 변환
+    public ResponseDto<CardResponse> createOrUpdateCard(AuthUser authUser, Long listId, CardRequest request) {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if(member.getRole() == MemberRole.READ_ONLY) {
+            throw new AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
+        }
+
         List<Manager> managers = request.getManagers().stream()
                 .map(managerRequest -> managerRepository.findById(managerRequest.getId())
                         .orElseThrow(() -> new IllegalArgumentException("잘못된 manager ID 입니다.")))
@@ -61,7 +73,14 @@ public class CardService {
     }
 
     @Transactional
-    public ResponseDto<CardResponse> updateCard(Long listId, Long cardId, CardRequest request) {
+    public ResponseDto<CardResponse> updateCard(AuthUser authUser, Long listId, Long cardId, CardRequest request) {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if(member.getRole() == MemberRole.READ_ONLY) {
+            throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
+        }
+
         cardListRepository.findById(listId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 card list ID 입니다."));
 
@@ -84,7 +103,14 @@ public class CardService {
     }
 
     @Transactional
-    public ResponseDto<Void> deleteCard(Long listId, Long cardId) {
+    public ResponseDto<Void> deleteCard(AuthUser authUser, Long listId, Long cardId) {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if(member.getRole() == MemberRole.READ_ONLY) {
+            throw new AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
+        }
+
         cardListRepository.findById(listId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 card list ID 입니다."));
 

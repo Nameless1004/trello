@@ -19,6 +19,7 @@ public class WorkspaceService {
         return workspaceRepository.save(workspace);
     }
 
+    @Transactional(readOnly = true)
     public List<Workspace> getUserWorkspaces(Long userId) {
         return workspaceRepository.findAllUserWorkspaces(userId);
     }

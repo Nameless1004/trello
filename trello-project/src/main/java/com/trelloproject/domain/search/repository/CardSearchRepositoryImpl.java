@@ -48,7 +48,7 @@ public class CardSearchRepositoryImpl implements CardSearchRepositoryCustom {
                 ))
                 .distinct() // 중복된 결과 제거
                 .from(card)
-                .join(card.cardListId, cardList)
+                .join(card.cardList, cardList)
                 .join(cardList.board, board)
                 .leftJoin(card.managers, manager)
                 .where(bb)
@@ -102,7 +102,7 @@ public class CardSearchRepositoryImpl implements CardSearchRepositoryCustom {
                 .select(Wildcard.count)
                 .distinct()
                 .from(card)
-                .join(card.cardListId, cardList)
+                .join(card.cardList, cardList)
                 .join(cardList.board, board)
                 .leftJoin(card.managers, manager)
                 .where(bb)

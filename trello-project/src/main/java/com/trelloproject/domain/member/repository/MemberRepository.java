@@ -10,4 +10,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m FROM Member m LEFT JOIN FETCH m.user WHERE m.user.id=:userId")
     Optional<Member> findByUserId(@Param("userId") long userId);
+  
+    Optional<Member> findByWorkspace_IdAndUser_Id(Long workspace_id, Long user_id);
 }

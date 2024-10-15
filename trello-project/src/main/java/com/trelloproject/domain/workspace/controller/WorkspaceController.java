@@ -30,10 +30,17 @@ public class WorkspaceController {
     }
 
     @GetMapping("/workspaces")
-    public ResponseDto<List<WorkspaceResponse.WorkspaceWithMember>> getWorkspaces(@AuthenticationPrincipal AuthUser authUser) {
+    public ResponseDto<List<WorkspaceResponse.Workspace>> getWorkspaces(@AuthenticationPrincipal AuthUser authUser) {
         List<Workspace> workspaces = workspaceService.getUserWorkspaces(authUser.getUserId());
-        List<WorkspaceResponse.WorkspaceWithMember> workspacesDtos = workspaces.stream().map(w -> new WorkspaceResponse.WorkspaceWithMember(w.getMembers(), w.getId(), w.getName(), w.getDescription())).toList();
+        List<WorkspaceResponse.Workspace> workspacesDtos = workspaces.stream().map(w -> new WorkspaceResponse.Workspace(w.getId(), w.getName(), w.getDescription())).toList();
         return ResponseDto.of(HttpStatus.OK, "워크스페이스 목록을 불러왔습니다.", workspacesDtos);
+    }
+
+    @GetMapping("/workspaces/{workspaceId}")
+    @PreAuthorize("hasRole(T(com.trelloproject.common.enums.UserRole.Authority).ADMIN) or @workspaceService.hasPermissionToGetWorkspace(#workspaceId, #authUser)")
+    public ResponseDto<WorkspaceResponse.WorkspaceWithMember> getWorkspace(@PathVariable Long workspaceId, @AuthenticationPrincipal AuthUser authUser) {
+        Workspace workspace = workspaceService.getWorkspace(workspaceId);
+        return ResponseDto.of(HttpStatus.OK, "워크스페이스를 불러왔습니다.", new WorkspaceResponse.WorkspaceWithMember(workspace.getMembers(), workspace.getId(), workspace.getName(), workspace.getDescription()));
     }
 
     @PostMapping("/workspaces/{workspaceId}/members")
@@ -41,5 +48,12 @@ public class WorkspaceController {
     public ResponseDto<WorkspaceResponse.WorkspaceWithMember> addMember(@PathVariable Long workspaceId, @Valid @RequestBody WorkspaceRequest.AddMember addMemberRequestDto, @AuthenticationPrincipal AuthUser authUser) {
         Workspace workspace = workspaceService.addMember(workspaceId, addMemberRequestDto.userId(), addMemberRequestDto.memberRole());
         return ResponseDto.of(HttpStatus.CREATED, "워크스페이스에 멤버가 추가되었습니다.", new WorkspaceResponse.WorkspaceWithMember(workspace.getMembers(), workspace.getId(), workspace.getName(), workspace.getDescription()));
+    }
+
+    @DeleteMapping("/workspaces/{workspaceId}/members/{memberId}")
+    @PreAuthorize("hasRole(T(com.trelloproject.common.enums.UserRole.Authority).ADMIN) or @workspaceService.hasPermissionToDeleteMember(#workspaceId, #memberId, #authUser)")
+    public ResponseDto deleteMember(@PathVariable Long workspaceId, @PathVariable Long memberId, @AuthenticationPrincipal AuthUser authUser) {
+        workspaceService.deleteMember(workspaceId, memberId);
+        return ResponseDto.of(HttpStatus.NO_CONTENT, "멤버가 삭제되었습니다.");
     }
 }

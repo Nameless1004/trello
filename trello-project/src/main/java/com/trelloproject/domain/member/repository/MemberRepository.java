@@ -9,10 +9,14 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Query("SELECT m FROM Member m LEFT JOIN FETCH m.user WHERE m.user.id=:userId")
+    @Query("SELECT m FROM Member m LEFT JOIN FETCH m.user WHERE m.user.id=:userId AND m.deleted=false")
     Optional<Member> findByUserId(@Param("userId") long userId);
 
     Optional<Member> findByWorkspace_IdAndUser_Id(Long workspace_id, Long user_id);
 
     boolean existsByWorkspace_IdAndUser_Id(Long workspace_id, Long user_id);
+
+    boolean existsByWorkspace_IdAndId(Long workspace_id, Long id);
+
+    Optional<Member> findByWorkspace_IdAndId(Long workspace_id, Long id);
 }

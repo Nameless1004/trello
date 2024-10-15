@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,7 +23,6 @@ public class WebSecurityConfig {
 
     private final SecurityFilter securityFilter;
     private final CorsConfigurationSource corsConfigurationSource;
-    private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,17 +36,9 @@ public class WebSecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // BasicAuthenticationFilter 비활성화
                 .logout(AbstractHttpConfigurer::disable) // LogoutFilter 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue", "/error").permitAll()
                         .requestMatchers("/auth/logout").authenticated()
-                        .anyRequest().authenticated())
-                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
-                        httpSecurityExceptionHandlingConfigurer
-                                .authenticationEntryPoint((request, response, authException) -> {
-                                    handlerExceptionResolver.resolveException(request, response, null, authException);
-                                })
-                                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                                    handlerExceptionResolver.resolveException(request, response, null, accessDeniedException);
-                                }));
+                        .anyRequest().authenticated());
 
         http.cors(c -> {
             c.configurationSource(corsConfigurationSource);

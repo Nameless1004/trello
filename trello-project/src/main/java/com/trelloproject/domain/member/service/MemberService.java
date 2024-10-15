@@ -1,6 +1,7 @@
 package com.trelloproject.domain.member.service;
 
 import com.trelloproject.common.enums.MemberRole;
+import com.trelloproject.common.exceptions.InvalidRequestException;
 import com.trelloproject.domain.member.dto.MemberRequest;
 import com.trelloproject.domain.member.entity.Member;
 import com.trelloproject.domain.member.repository.MemberRepository;
@@ -16,7 +17,7 @@ public class MemberService {
 
     @Transactional
     public Member updateMemberRole(Long memberId, MemberRole memberRole) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("해당하는 memberId의 멤버가 존재하지 않습니다."));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new InvalidRequestException("해당하는 memberId의 멤버가 존재하지 않습니다."));
         member.setRole(memberRole);
         return memberRepository.save(member);
     }
@@ -26,7 +27,7 @@ public class MemberService {
         if (updateRoleRequest.memberRole().equals(MemberRole.WORKSPACE))
             return false;
 
-        Member userMember = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId()).orElseThrow();
+        Member userMember = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId()).orElseThrow(() -> new InvalidRequestException("해당하는 멤버가 존재하지 않습니다."));
 
         // WORKSPACE가 아닌 역할로 변경 하는데 멤버 권한이 WORKSPACE가 아닐때
         return userMember.getRole().equals(MemberRole.WORKSPACE);

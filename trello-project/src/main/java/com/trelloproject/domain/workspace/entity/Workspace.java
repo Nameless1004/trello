@@ -23,7 +23,7 @@ public class Workspace {
     @Column(nullable = false)
     String description;
 
-    @OneToMany(mappedBy = "workspace")
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Member> members;
 
     @Builder

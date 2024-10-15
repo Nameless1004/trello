@@ -31,10 +31,8 @@ public class Comment {
         this.description = description;
     }
 
-    public Comment(Comment comment) {
-        this.card = comment.getCard();
-        this.member = comment.getMember();
-        this.description = comment.getDescription();
+    public void updateComment(String description) {
+        this.description = description;
     }
 }
 

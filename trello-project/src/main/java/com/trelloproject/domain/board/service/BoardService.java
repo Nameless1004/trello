@@ -84,7 +84,7 @@ public class BoardService {
 
         // 로그인하지 않은 멤버가 수정하려는 경우
         if(authUser == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인을 해주세요.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인을 해주세요..");
         }
 
         // 읽기 전용 역할을 가진 멤버가 보드를 수정하려는 경우

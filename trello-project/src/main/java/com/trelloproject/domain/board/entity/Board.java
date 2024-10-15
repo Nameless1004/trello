@@ -17,23 +17,29 @@ public class Board {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String title;
-    String bgColor;
+    private Long id;
+    private String title;
+    private String bgColor;
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    Workspace workspace;
+    private Workspace workspace;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    List<CardList> lists = new ArrayList<>();
+    private List<CardList> lists = new ArrayList<>();
 
 //    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //    Attachment attachment;
 
-    public Board(String title, String bgColor) {
+    public void imageUrl (String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Board(String title, String bgColor, String imageUrl) {
         this.title = title;
         this.bgColor = bgColor;
+        this.imageUrl = imageUrl;
     }
 
     public void update(String title, String bgColor) {

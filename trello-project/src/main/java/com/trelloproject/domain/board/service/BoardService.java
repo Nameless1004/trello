@@ -3,11 +3,16 @@ package com.trelloproject.domain.board.service;
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
 import com.trelloproject.common.exceptions.*;
+import com.trelloproject.common.service.S3Service;
+import com.trelloproject.domain.attachment.dto.AttachmentResponse;
+import com.trelloproject.domain.attachment.entity.Attachment;
 import com.trelloproject.domain.board.dto.BoardRequest;
 import com.trelloproject.domain.board.dto.BoardResponse;
 import com.trelloproject.domain.board.entity.Board;
 import com.trelloproject.domain.board.repository.BoardRepository;
+import com.trelloproject.domain.card.entity.Card;
 import com.trelloproject.domain.card.repository.CardRepository;
+import com.trelloproject.domain.list.entity.CardList;
 import com.trelloproject.domain.list.repository.CardListRepository;
 import com.trelloproject.domain.member.entity.Member;
 import com.trelloproject.domain.member.repository.MemberRepository;
@@ -18,8 +23,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -31,11 +38,12 @@ public class BoardService {
     private final MemberRepository memberRepository;
     private final WorkspaceRepository workspaceRepository;
     private final CardRepository cardRepository;
+    private final S3Service s3Service;
 
     /**
      * 보드 생성
      */
-    public ResponseDto<BoardResponse.CreatedBoard> createdBoard(AuthUser authUser, long workspaceId, BoardRequest.CreatedBoard request) {
+    public ResponseDto<BoardResponse.CreatedBoard> createdBoard(AuthUser authUser, long workspaceId, MultipartFile file, BoardRequest.CreatedBoard request) {
 
         // 해당 워크스페이스가 존재하지 않을 때
         Workspace workspace = workspaceRepository.findById(workspaceId)
@@ -57,12 +65,22 @@ public class BoardService {
         String title = request.title();
         String bgColor = request.bgColor();
 
+        String fileUrl = null;
+        if (file != null) {
+            // 파일 저장
+            try {
+                fileUrl = s3Service.uploadFile(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         // 제목이 비어있는 경우
         if(title.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
         }
 
-        Board board = new Board(title, bgColor);
+        Board board = new Board(title, bgColor, fileUrl);
         boardRepository.save(board);
 
         return ResponseDto.of(HttpStatus.CREATED, "보드 생성에 성공했습니다.", new BoardResponse.CreatedBoard(board.getId(), board.getTitle(), board.getBgColor()));
@@ -140,10 +158,10 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(BoardNotFoundException::new);
 
-//        List<CardList> cardList = cardListRepository.findByBoardId(boardId);
-//        List<Card> card = cardRepository.findByBoardId(boardId);
+        List<CardList> cardList = cardListRepository.findByBoardId(boardId);
+        List<Card> card = cardRepository.findByBoardId(boardId);
 
-        return ResponseDto.of(HttpStatus.OK, "보드 단건 조회에 성공했습니다.");//, new BoardResponse.DetailBoard(board.getId(), board.getTitle(), board.getBgColor(), cardList, card));
+        return ResponseDto.of(HttpStatus.OK, "보드 단건 조회에 성공했습니다.", new BoardResponse.DetailBoard(board.getId(), board.getTitle(), board.getBgColor(), cardList, card));
     }
 
     /**

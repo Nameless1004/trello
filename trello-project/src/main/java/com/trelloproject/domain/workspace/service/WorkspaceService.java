@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class WorkspaceService {
@@ -15,5 +17,10 @@ public class WorkspaceService {
     public Workspace createWorkspace(String name, String description) {
         Workspace workspace = Workspace.builder().name(name).description(description).build();
         return workspaceRepository.save(workspace);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Workspace> getUserWorkspaces(Long userId) {
+        return workspaceRepository.findAllUserWorkspaces(userId);
     }
 }

@@ -26,7 +26,7 @@ public class Card extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cardlist_id", nullable = false)
-    private CardList cardListId;
+    private CardList cardList;
 
     private String title;
     private String description;
@@ -50,10 +50,6 @@ public class Card extends Timestamped {
     @OneToMany(mappedBy = "card", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Attachment> attachments = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cardlist_id")
-    private CardList cardList;
-
     private Long viewCount = 0L;
 
     // 카드 생성 시 매니저 리스트를 추가
@@ -75,7 +71,7 @@ public class Card extends Timestamped {
     }
 
     public void setCardList(CardList cardList) {
-        this.cardListId = cardList;
+        this.cardList = cardList;
         cardList.getCards().add(this);
     }
 }

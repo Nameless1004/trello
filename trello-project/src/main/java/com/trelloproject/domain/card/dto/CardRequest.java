@@ -12,6 +12,6 @@ public class CardRequest {
     private String description;
     private LocalDate deadline;
     private String status;
-    private List<ManagerRequest> managers;  // 매니저 리스트를 ManagerRequest로 처리
+    private List<ManagerRequest> managers;
 }
 

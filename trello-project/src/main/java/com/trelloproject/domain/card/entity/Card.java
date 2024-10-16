@@ -35,8 +35,7 @@ public class Card extends Timestamped {
     @Enumerated(EnumType.STRING)
     private CardStatus status;
 
-    // 매니저를 다대다 관계로 설정
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "card_managers",
             joinColumns = @JoinColumn(name = "card_id"),
@@ -52,7 +51,6 @@ public class Card extends Timestamped {
 
     private Long viewCount = 0L;
 
-    // 카드 생성 시 매니저 리스트를 추가
     public Card(CardRequest request, List<Manager> managers) {
         this.title = request.getTitle();
         this.description = request.getDescription();
@@ -61,7 +59,6 @@ public class Card extends Timestamped {
         this.managers = managers;
     }
 
-    // 카드 수정 시 매니저 리스트 업데이트
     public void updateCard(CardRequest request, List<Manager> managers) {
         this.title = request.getTitle();
         this.description = request.getDescription();

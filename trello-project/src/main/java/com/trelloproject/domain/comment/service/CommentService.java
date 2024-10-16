@@ -65,7 +65,7 @@ public class CommentService {
 
         // 댓글 삭제
         commentRepository.delete(comment);
-        return ResponseDto.of(HttpStatus.NO_CONTENT, "댓글을 성공적으로 삭제되었습니다.");
+        return ResponseDto.of(HttpStatus.OK, "댓글을 성공적으로 삭제되었습니다.");
     }
 
     private Member validateMemberAndCheckPermissions(AuthUser authUser) {

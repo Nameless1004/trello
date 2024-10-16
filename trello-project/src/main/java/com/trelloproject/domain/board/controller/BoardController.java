@@ -26,7 +26,7 @@ public class BoardController {
      * @param workspaceId
      * @return
      */
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> createdBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                                 @PathVariable long workspaceId,
                                                                                 @RequestPart("file") MultipartFile file,
@@ -59,7 +59,7 @@ public class BoardController {
      * @param workspaceId
      * @return
      */
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<ResponseDto<List<BoardResponse.GetBoard>>> getBoards(@PathVariable long workspaceId) {
         return ResponseDto.toEntity(boardService.getBoards(workspaceId));
     }

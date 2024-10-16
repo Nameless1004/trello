@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ManagerRequest {
-    private Long id;
-    private String name;
-    private String role;
-    private Long memberId;  // Member ID 포함
+    private Long memberId;
 }
 

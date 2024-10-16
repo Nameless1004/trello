@@ -78,10 +78,10 @@ public class CardSearchRepositoryCustomImpl implements CardSearchRepositoryCusto
             bb.and(card.deadline.eq(searchDto.deadline()));
         }
 
-        // manager에 값이 있으면 카드 마감일이 해당 값과 일치하는지 확인하는 조건
-        if(StringUtils.hasText(searchDto.manager())) {
-            bb.and(manager.name.containsIgnoreCase(searchDto.manager()));
-        }
+//        // manager에 값이 있으면 카드 마감일이 해당 값과 일치하는지 확인하는 조건
+//        if(StringUtils.hasText(searchDto.manager())) {
+//            bb.and(manager.name.containsIgnoreCase(searchDto.manager()));
+//        }
 
         return bb;
     }

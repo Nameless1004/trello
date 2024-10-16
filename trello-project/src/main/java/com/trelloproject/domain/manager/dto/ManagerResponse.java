@@ -7,13 +7,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ManagerResponse {
     private Long id;
-    private String name;
-    private String role;
+    private Long managerId;
 
     public ManagerResponse(Manager manager) {
         this.id = manager.getId();
-        this.name = manager.getName();
-        this.role = manager.getRole();
+        this.managerId = manager.getMember().getId();
     }
 }
 

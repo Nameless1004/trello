@@ -3,6 +3,7 @@ package com.trelloproject.domain.comment.service;
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
 import com.trelloproject.common.exceptions.AccessDeniedException;
+import com.trelloproject.common.exceptions.CardNotFoundException;
 import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.domain.card.entity.Card;
 import com.trelloproject.domain.card.repository.CardRepository;
@@ -70,8 +71,8 @@ public class CommentService {
 
     private Member validateMemberAndCheckPermissions(AuthUser authUser, Long cardId) {
         // 카드 작성자의 권한을 확인하는 로직 (읽기 전용 멤버 제한)
-        Long workspaceId = cardRepository.findWithCardListAndBoardAndWorkspaceIdByCardId(cardId);
-        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
+        Card workspaceId = cardRepository.findWithCardListAndBoardAndWorkspaceIdByCardId(cardId).orElseThrow(CardNotFoundException::new);
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId.getId(), authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
         if (member.getRole().equals(MemberRole.ROLE_READ_ONLY)) {

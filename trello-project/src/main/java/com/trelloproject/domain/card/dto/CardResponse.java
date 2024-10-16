@@ -23,6 +23,7 @@ public class CardResponse {
 
     private List<String> attachmentUrls;
     private List<CommentResponse> comments;
+    private Long viewCount;
 
     public CardResponse(Card card) {
         this.cardId = card.getId();
@@ -39,5 +40,6 @@ public class CardResponse {
         this.comments = card.getComments().stream()
                 .map(CommentResponse::new)
                 .collect(Collectors.toList());
+        this.viewCount = card.getViewCount();
     }
 }

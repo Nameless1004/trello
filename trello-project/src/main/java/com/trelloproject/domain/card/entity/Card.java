@@ -51,6 +51,9 @@ public class Card extends Timestamped {
 
     private Long viewCount = 0L;
 
+    @Version
+    private Long version;
+
     public Card(CardRequest request, List<Manager> managers) {
         this.title = request.getTitle();
         this.description = request.getDescription();

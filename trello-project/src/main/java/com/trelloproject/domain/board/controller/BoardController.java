@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,8 +30,9 @@ public class BoardController {
     @PostMapping("")
     public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> createdBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                                 @RequestBody long workspaceId,
+                                                                                @RequestPart("file") MultipartFile file,
                                                                                 @RequestBody BoardRequest.CreatedBoard request) {
-        return ResponseDto.toEntity(boardService.createdBoard(authUser, workspaceId, request));
+        return ResponseDto.toEntity(boardService.createdBoard(authUser, workspaceId, file, request));
     }
 
     /**

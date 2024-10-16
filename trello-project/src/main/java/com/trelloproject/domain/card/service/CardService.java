@@ -34,7 +34,6 @@ public class CardService {
 
     @Transactional
     public ResponseDto<CardResponse> createOrUpdateCard(AuthUser authUser, Long listId, CardRequest request) {
-        // 카드 작성자의 권한 확인 (매니저 ID 확인 없이 진행)
         Member member = validateMemberAndCheckPermissions(authUser);
         CardList cardList = findByIdOrThrow(cardListRepository, listId, "card list");
 
@@ -42,7 +41,7 @@ public class CardService {
                 .map(managerRequest -> new Manager(member))
                 .collect(Collectors.toList());
 
-        Card card = new Card(request, managers);  // 카드 생성 시 매니저 할당
+        Card card = new Card(request, managers);
         card.setCardList(cardList);
         cardRepository.save(card);
 
@@ -59,7 +58,6 @@ public class CardService {
 
     @Transactional
     public ResponseDto<CardResponse> updateCard(AuthUser authUser, Long listId, Long cardId, CardRequest request) {
-        // 수정 요청자의 권한 확인 (매니저 ID 확인 없이 진행)
         Member member = validateMemberAndCheckPermissions(authUser);
         findByIdOrThrow(cardListRepository, listId, "card list");
 
@@ -86,7 +84,7 @@ public class CardService {
         }
 
         cardRepository.deleteById(cardId);
-        return ResponseDto.of(HttpStatus.NO_CONTENT, "카드가 성공적으로 삭제되었습니다.");
+        return ResponseDto.of(HttpStatus.OK, "카드가 성공적으로 삭제되었습니다.");
     }
 
     private Member validateMemberAndCheckPermissions(AuthUser authUser) {

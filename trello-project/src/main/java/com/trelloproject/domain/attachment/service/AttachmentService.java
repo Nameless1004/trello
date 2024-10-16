@@ -42,7 +42,7 @@ public class AttachmentService {
     // 파일 저장
     @Transactional
     public ResponseDto<AttachmentResponse> saveFile(AuthUser authUser, Long cardId, MultipartFile file) throws IOException {
-        Member member = validateMember(authUser);
+        Member member = validateMember(authUser, cardId);
         Card card = validateCard(cardId);
 
         validateFileTypeAndSize(file);
@@ -71,7 +71,7 @@ public class AttachmentService {
     // 첨부파일 삭제
     @Transactional
     public ResponseDto<Void> deleteFile(AuthUser authUser, Long cardId, Long fileId) {
-        Member member = validateMember(authUser);
+        Member member = validateMember(authUser, cardId);
         Card card = validateCard(cardId);
 
         Attachment attachment = attachmentRepository.findById(fileId)
@@ -87,8 +87,9 @@ public class AttachmentService {
     }
 
     // 멤버 유효성 검사
-    private Member validateMember(AuthUser authUser) {
-        Member member = memberRepository.findByUserId(authUser.getUserId())
+    private Member validateMember(AuthUser authUser, Long cardId) {
+        Long workspaceId = cardRepository.findWithCardListAndBoardAndWorkspaceIdByCardId(cardId);
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
         if (member.getRole() == MemberRole.READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 해당 작업을 수행할 수 없습니다.");

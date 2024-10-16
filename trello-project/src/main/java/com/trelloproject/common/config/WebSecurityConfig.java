@@ -37,7 +37,6 @@ public class WebSecurityConfig {
                 .logout(AbstractHttpConfigurer::disable) // LogoutFilter 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue", "/error").permitAll()
-                        .requestMatchers("/auth/logout").authenticated()
                         .anyRequest().authenticated());
 
         http.cors(c -> {

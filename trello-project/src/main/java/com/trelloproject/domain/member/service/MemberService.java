@@ -24,12 +24,12 @@ public class MemberService {
 
     public boolean hasPermissionToUpdateRole(Long workspaceId, MemberRequest.UpdateRole updateRoleRequest, AuthUser authUser) {
         // WORKSPACE로 변경하려 하는데 유저 권한이 ADMIN이 아닐때
-        if (updateRoleRequest.memberRole().equals(MemberRole.WORKSPACE)) return false;
+        if (updateRoleRequest.memberRole().equals(MemberRole.ROLE_WORKSPACE)) return false;
 
         try {
             Member userMember = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId()).orElseThrow(() -> new InvalidRequestException("해당하는 멤버가 존재하지 않습니다."));
             // WORKSPACE가 아닌 역할로 변경 하는데 멤버 권한이 WORKSPACE가 아닐때
-            return userMember.getRole().equals(MemberRole.WORKSPACE);
+            return userMember.getRole().equals(MemberRole.ROLE_WORKSPACE);
         } catch (Exception e) {
             return false;
         }

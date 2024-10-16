@@ -22,7 +22,7 @@ public interface CardListRepository extends JpaRepository<CardList, Long> {
     List<CardList> findAllByBoardOrderByOrderWithWriteLock(@Param("board") Board board);
 
     @Query("SELECT max(cl.orderIndex) FROM CardList cl")
-    int maxOrderIndex();
+    Integer maxOrderIndex();
 
     @Modifying
     @Query("UPDATE CardList cl SET cl.orderIndex = cl.orderIndex + :dir WHERE cl.id IN :cardListIds")

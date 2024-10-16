@@ -32,6 +32,8 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
+    private boolean deleted;
+
     @Builder
     public User(String username, String password, String email, String nickname, UserRole role) {
         this.username = username;
@@ -39,5 +41,9 @@ public class User {
         this.email = email;
         this.nickname = nickname;
         this.role = role;
+    }
+
+    public void delete() {
+        deleted = true;
     }
 }

@@ -2,20 +2,10 @@ package com.trelloproject.domain.search.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.trelloproject.domain.board.entity.QBoard;
-import com.trelloproject.domain.card.entity.QCard;
-import com.trelloproject.domain.list.entity.QCardList;
-import com.trelloproject.domain.manager.entity.QManager;
 import com.trelloproject.domain.search.dto.CardSearchDto;
-import com.trelloproject.domain.user.entitiy.QUser;
-import com.trelloproject.domain.workspace.entity.QWorkspace;
-import com.trelloproject.security.AuthUser;
-import io.github.classgraph.TypeArgument;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.type.descriptor.DateTimeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +19,7 @@ import static com.trelloproject.domain.list.entity.QCardList.cardList;
 import static com.trelloproject.domain.manager.entity.QManager.manager;
 
 @RequiredArgsConstructor
-public class CardSearchRepositoryImpl implements CardSearchRepositoryCustom {
+public class CardSearchRepositoryCustomImpl implements CardSearchRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override

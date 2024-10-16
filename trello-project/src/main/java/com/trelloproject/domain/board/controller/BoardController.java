@@ -1,7 +1,6 @@
 package com.trelloproject.domain.board.controller;
 
 import com.trelloproject.common.dto.ResponseDto;
-import com.trelloproject.domain.board.dto.BoardRequest;
 import com.trelloproject.domain.board.dto.BoardResponse;
 import com.trelloproject.domain.board.service.BoardService;
 import com.trelloproject.security.AuthUser;
@@ -15,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/workspaces/{workspaceId}/boards")
 public class BoardController {
 
     private final BoardService boardService;
@@ -27,7 +26,7 @@ public class BoardController {
      * @param workspaceId
      * @return
      */
-    @PostMapping("/workspaces/{workspaceId}/boards")
+    @PostMapping("")
     public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> createdBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                                 @PathVariable long workspaceId,
                                                                                 @RequestPart("file") MultipartFile file,
@@ -44,7 +43,7 @@ public class BoardController {
      * @param boardId
      * @return
      */
-    @PutMapping("/workspaces/{workspaceId}/boards/{boardId}")
+    @PutMapping("/{boardId}")
     public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                                @PathVariable long workspaceId,
                                                                                @PathVariable long boardId,
@@ -56,10 +55,11 @@ public class BoardController {
 
     /**
      * 보드 다건 조회
+     *
      * @param workspaceId
      * @return
      */
-    @GetMapping("/workspace/{workspaceId}/board")
+    @GetMapping("")
     public ResponseEntity<ResponseDto<List<BoardResponse.GetBoard>>> getBoards(@PathVariable long workspaceId) {
         return ResponseDto.toEntity(boardService.getBoards(workspaceId));
     }
@@ -71,9 +71,9 @@ public class BoardController {
      * @param boardId
      * @return
      */
-    @GetMapping("/workspaces/{workspaceId}/boards/{boardId}")
+    @GetMapping("/{boardId}")
     public ResponseEntity<ResponseDto<BoardResponse.DetailBoard>> getBoard(@PathVariable long workspaceId,
-                                                                         @PathVariable long boardId) {
+                                                                           @PathVariable long boardId) {
         return ResponseDto.toEntity(boardService.getBoard(workspaceId, boardId));
     }
 
@@ -85,7 +85,7 @@ public class BoardController {
      * @param boardId
      * @return
      */
-    @DeleteMapping("/workspaces/{workspaceId}/boards/{boardId}")
+    @DeleteMapping("/{boardId}")
     public ResponseEntity<ResponseDto<Void>> deleteBoard(@AuthenticationPrincipal AuthUser authUser,
                                                          @PathVariable long workspaceId,
                                                          @PathVariable long boardId) {

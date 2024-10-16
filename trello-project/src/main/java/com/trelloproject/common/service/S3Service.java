@@ -2,8 +2,10 @@ package com.trelloproject.common.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.trelloproject.domain.attachment.dto.S3UploadResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,14 +25,14 @@ public class S3Service {
     @Value("${s3.bucket}")
     private String bucket;
 
-    public String uploadFile(MultipartFile multipartFile) throws IOException {
+    public S3UploadResponse uploadFile(MultipartFile multipartFile) throws IOException {
         String fileName = createFileName(multipartFile.getOriginalFilename());
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());
 
         amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata));
-        return amazonS3Client.getUrl(bucket, fileName).toString();
+        return new S3UploadResponse(amazonS3Client.getUrl(bucket, fileName).toString(), fileName);
     }
 
     private String createFileName(String originalFileName) {
@@ -57,6 +59,10 @@ public class S3Service {
         } else {
             System.out.println("파일이 삭제되지 못했습니다.");
         }
+    }
+
+    public void deleteFile(String key) {
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, key));
     }
 
     private Optional<File> convert(MultipartFile file) throws IOException {

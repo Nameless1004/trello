@@ -1,6 +1,6 @@
 package com.trelloproject.domain.board.entity;
 
-import com.trelloproject.domain.attachment.entity.Attachment;
+import com.trelloproject.domain.attachment.dto.S3UploadResponse;
 import com.trelloproject.domain.list.entity.CardList;
 import com.trelloproject.domain.workspace.entity.Workspace;
 import jakarta.persistence.*;
@@ -21,6 +21,7 @@ public class Board {
     private String title;
     private String bgColor;
     private String imageUrl;
+    private String s3Key;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -29,18 +30,18 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CardList> lists = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    Attachment attachment;
 
-    public void imageUrl (String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrlAndKey (S3UploadResponse s3UploadResponse) {
+        if(s3UploadResponse != null) {
+            this.imageUrl = s3UploadResponse.getS3Url();
+            this.s3Key = s3UploadResponse.getS3Key();
+        }
     }
 
-    public Board(Workspace workspace, String title, String bgColor, String imageUrl) {
+    public Board(Workspace workspace, String title, String bgColor) {
         this.workspace = workspace;
         this.title = title;
         this.bgColor = bgColor;
-        this.imageUrl = imageUrl;
     }
 
     public void update(String title, String bgColor) {

@@ -24,15 +24,15 @@ public class BoardController {
      *
      * @param authUser
      * @param workspaceId
-     * @param request
      * @return
      */
     @PostMapping("/workspaces/{workspaceId}/boards")
     public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> createdBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                                @RequestBody long workspaceId,
+                                                                                @PathVariable long workspaceId,
                                                                                 @RequestPart("file") MultipartFile file,
-                                                                                @RequestBody BoardRequest.CreatedBoard request) {
-        return ResponseDto.toEntity(boardService.createdBoard(authUser, workspaceId, file, request));
+                                                                                @RequestPart("title") String title,
+                                                                                @RequestPart(value = "bgColor", required = false) String bgColor) {
+        return ResponseDto.toEntity(boardService.createdBoard(authUser, workspaceId, file, title, bgColor));
     }
 
     /**
@@ -41,16 +41,17 @@ public class BoardController {
      * @param authUser
      * @param workspaceId
      * @param boardId
-     * @param request
      * @return
      */
-    @PutMapping("/workspaces/{workspaceId}/boards/{boardId}")
-    public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
-                                                                                @RequestBody long workspaceId,
-                                                                                @RequestBody long boardId,
-                                                                                @RequestBody BoardRequest.UpdateBoard request) {
-        return ResponseDto.toEntity(boardService.updateBoard(authUser, workspaceId, boardId, request));
-    }
+//    @PutMapping("/workspaces/{workspaceId}/boards/{boardId}")
+//    public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
+//                                                                               @PathVariable long workspaceId,
+//                                                                               @PathVariable long boardId,
+//                                                                               @RequestPart("file") MultipartFile file,
+//                                                                               @RequestPart("title") String title,
+//                                                                               @RequestPart(value = "bgColor", required = false) String bgColor) {
+//        return ResponseDto.toEntity(boardService.updateBoard(authUser, workspaceId, boardId, file, title, bgColor));
+//    }
 
     /**
      * 보드 다건 조회

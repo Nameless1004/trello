@@ -11,4 +11,7 @@ import java.util.List;
 public interface CardRepository extends JpaRepository<Card, Long>, CardSearchRepositoryCustom {
     @Query("SELECT c FROM Card c WHERE c.cardList.board.id = :boardId")
     List<Card> findByBoardId(@Param("boardId") Long boardId);
+
+    @Query("SELECT cl FROM Card cl JOIN FETCH cl.cardList b JOIN FETCH b.board c JOIN FETCH c.workspace WHERE cl.id = :cardId")
+    Long findWithCardListAndBoardAndWorkspaceIdByCardId(@Param("cardId") long cardId);
 }

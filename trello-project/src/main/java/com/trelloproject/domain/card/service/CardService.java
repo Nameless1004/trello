@@ -3,6 +3,7 @@ package com.trelloproject.domain.card.service;
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
 import com.trelloproject.common.exceptions.AccessDeniedException;
+import com.trelloproject.common.exceptions.InvalidRequestException;
 import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.domain.card.dto.CardRequest;
 import com.trelloproject.domain.card.dto.CardResponse;
@@ -34,7 +35,7 @@ public class CardService {
 
     @Transactional
     public ResponseDto<CardResponse> createOrUpdateCard(AuthUser authUser, Long listId, CardRequest request) {
-        Member member = validateMemberAndCheckPermissions(authUser);
+        Member member = validateMemberAndCheckPermissions(authUser, listId);
         CardList cardList = findByIdOrThrow(cardListRepository, listId, "card list");
 
         List<Manager> managers = request.getManagers().stream()
@@ -58,7 +59,7 @@ public class CardService {
 
     @Transactional
     public ResponseDto<CardResponse> updateCard(AuthUser authUser, Long listId, Long cardId, CardRequest request) {
-        Member member = validateMemberAndCheckPermissions(authUser);
+        Member member = validateMemberAndCheckPermissions(authUser, listId);
         findByIdOrThrow(cardListRepository, listId, "card list");
 
         Card card = findByIdOrThrow(cardRepository, cardId, "card");
@@ -76,7 +77,7 @@ public class CardService {
     @Transactional
     public ResponseDto<Void> deleteCard(AuthUser authUser, Long listId, Long cardId) {
         // 삭제 요청자의 권한 확인
-        validateMemberAndCheckPermissions(authUser);
+        validateMemberAndCheckPermissions(authUser, listId);
         findByIdOrThrow(cardListRepository, listId, "card list");
 
         if (!cardRepository.existsById(cardId)) {
@@ -87,12 +88,13 @@ public class CardService {
         return ResponseDto.of(HttpStatus.OK, "카드가 성공적으로 삭제되었습니다.");
     }
 
-    private Member validateMemberAndCheckPermissions(AuthUser authUser) {
+    private Member validateMemberAndCheckPermissions(AuthUser authUser, Long listId) {
         // 카드 작성자의 권한을 확인하는 로직 (읽기 전용 멤버 제한)
-        Member member = memberRepository.findByUserId(authUser.getUserId())
+        Long workspaceId = cardListRepository.findWithBoardAndWorkspaceByCardListId(listId);
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        if (member.getRole() == MemberRole.READ_ONLY) {
+        if (member.getRole().equals(MemberRole.READ_ONLY)) {
             throw new AccessDeniedException("읽기 전용 멤버는 작업을 수행할 수 없습니다.");
         }
 

@@ -30,7 +30,7 @@ public class CommentService {
     // 댓글 작성
     @Transactional
     public ResponseDto<CommentResponse> createComment(AuthUser authUser, Long cardId, CommentRequest commentRequest) {
-        Member member = validateMemberAndCheckPermissions(authUser);
+        Member member = validateMemberAndCheckPermissions(authUser, cardId);
         Card card = findByIdOrThrow(cardRepository, cardId, "card");
 
         // 댓글 생성
@@ -43,7 +43,7 @@ public class CommentService {
     // 댓글 수정
     @Transactional
     public ResponseDto<CommentResponse> updateComment(AuthUser authUser, Long cardId, Long commentId, CommentRequest commentRequest) {
-        Member member = validateMemberAndCheckPermissions(authUser);
+        Member member = validateMemberAndCheckPermissions(authUser, cardId);
         findByIdOrThrow(cardRepository, cardId, "card");
 
         Comment comment = findCommentByIdAndCheckOwnership(commentId, member);
@@ -58,7 +58,7 @@ public class CommentService {
     // 댓글 삭제
     @Transactional
     public ResponseDto<Void> deleteComment(AuthUser authUser, Long cardId, Long commentId) {
-        Member member = validateMemberAndCheckPermissions(authUser);
+        Member member = validateMemberAndCheckPermissions(authUser, cardId);
         findByIdOrThrow(cardRepository, cardId, "card");
 
         Comment comment = findCommentByIdAndCheckOwnership(commentId, member);
@@ -68,11 +68,13 @@ public class CommentService {
         return ResponseDto.of(HttpStatus.OK, "댓글을 성공적으로 삭제되었습니다.");
     }
 
-    private Member validateMemberAndCheckPermissions(AuthUser authUser) {
-        Member member = memberRepository.findByUserId(authUser.getUserId())
+    private Member validateMemberAndCheckPermissions(AuthUser authUser, Long cardId) {
+        // 카드 작성자의 권한을 확인하는 로직 (읽기 전용 멤버 제한)
+        Long workspaceId = cardRepository.findWithCardListAndBoardAndWorkspaceIdByCardId(cardId);
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        if (member.getRole() == MemberRole.READ_ONLY) {
+        if (member.getRole().equals(MemberRole.READ_ONLY)) {
             throw new AccessDeniedException("읽기 전용 멤버는 작업을 수행할 수 없습니다.");
         }
 

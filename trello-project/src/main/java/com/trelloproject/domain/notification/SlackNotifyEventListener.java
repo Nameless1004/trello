@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SlackNotifyEventListener {
 
-    private final ApplicationEventPublisher publisher;
     private final SlackClient slackClient;
 
     /**

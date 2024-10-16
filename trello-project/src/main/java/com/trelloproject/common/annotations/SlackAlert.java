@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SlackAlert {
 
-    String message();
+    String onSuccess() default "";
+    String onFailure() default "";
+    boolean attachResult() default false;
     String hookUrl() default "";
 }

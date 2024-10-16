@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -72,8 +73,6 @@ public class BoardService {
 
         S3UploadResponse uploadResponse = null;
 
-
-
         Board board = new Board(workspace, title, bgColor);
 
         if (file != null) {
@@ -82,7 +81,6 @@ public class BoardService {
                 if(StringUtils.hasText(board.getImageUrl())) {
                     s3Service.deleteFile(board.getS3Key());
                 }
-
                 uploadResponse = s3Service.uploadFile(file);
             } catch (IOException e) {
                 throw new RuntimeException("file upload failed.", e);
@@ -103,49 +101,60 @@ public class BoardService {
     /**
      * 보드 수정
      */
-//    public ResponseDto<BoardResponse.CreatedBoard> updateBoard(AuthUser authUser, long workspaceId, long boardId, MultipartFile file, String title, String bgColor) {
-//
-//        // 해당 워크스페이스가 존재하지 않을 때
-//        Workspace workspace = workspaceRepository.findById(workspaceId)
-//                .orElseThrow(WorkspaceNotFounException::new);
-//
-//        // 해당 보드가 존재하지 않을 때
-//        Board board = boardRepository.findById(boardId)
-//                .orElseThrow(BoardNotFoundException::new);
-//
-//        // 로그인하지 않은 멤버가 수정하려는 경우
-//        if(authUser == null) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인을 해주세요..");
-//        }
-//
-//        // 읽기 전용 역할을 가진 멤버가 보드를 수정하려는 경우
-//        Member member = memberRepository.findByUserId(authUser.getUserId())
-//                .orElseThrow(MemberNotFoundException::new);
-//
-//        if (member.getRole() == MemberRole.READ_ONLY) {
-//            throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
-//        }
-//
-//        // 제목이 비어있는 경우
-//        if(title.isBlank()) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
-//        }
-//
-//        String fileUrl = board.getImageUrl();
-//
-//        if (file != null) {
-//            try {
-//                if (fileUrl != null) {
-//                    s3Service.putS3(fileUrl);
-//                }
-//            }
-//        }
-//
-//        board.update(title, bgColor, fileUrlRequest);
-//        boardRepository.save(board);
-//
-//        return ResponseDto.of(HttpStatus.OK, "보드 수정이 완료되었습니다.", new BoardResponse.CreatedBoard(board.getId(), board.getTitle(), bgColor));
-//    }
+    public ResponseDto<BoardResponse.CreatedBoard> updateBoard(AuthUser authUser, long workspaceId, long boardId, MultipartFile file, String title, String bgColor) {
+
+        // 해당 워크스페이스가 존재하지 않을 때
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(WorkspaceNotFounException::new);
+
+        // 해당 보드가 존재하지 않을 때
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(BoardNotFoundException::new);
+
+        // 로그인하지 않은 멤버가 수정하려는 경우
+        if(authUser == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인을 해주세요..");
+        }
+
+        // 읽기 전용 역할을 가진 멤버가 보드를 수정하려는 경우
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+
+        if (member.getRole() == MemberRole.READ_ONLY) {
+            throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
+        }
+
+        // 제목이 비어있는 경우
+        if(title.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
+        }
+
+        S3UploadResponse uploadResponse = null;
+
+        if (file != null) {
+            // 파일 저장
+            try {
+                if(StringUtils.hasText(board.getImageUrl())) {
+                    s3Service.deleteFile(board.getS3Key());
+                }
+                uploadResponse = s3Service.uploadFile(file);
+            } catch (IOException e) {
+                throw new RuntimeException("file upload failed.", e);
+            }
+        } else {
+            // multipart file null일 때 s3 저장되어 있으면 파일 삭제
+            if(StringUtils.hasText(board.getImageUrl())) {
+                s3Service.deleteFile(board.getS3Key());
+            }
+        }
+
+        board.setImageUrlAndKey(uploadResponse);
+
+        board.update(title, bgColor);
+        boardRepository.save(board);
+
+        return ResponseDto.of(HttpStatus.OK, "보드 수정이 완료되었습니다.", new BoardResponse.CreatedBoard(board.getId(), board.getTitle(), board.getBgColor(), board.getImageUrl()));
+    }
 
     /**
      * 보드 다건 조회

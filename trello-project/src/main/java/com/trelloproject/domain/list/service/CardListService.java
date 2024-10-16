@@ -76,7 +76,7 @@ public class CardListService {
             throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
         }
 
-        Integer max = cardListRepository.maxOrderIndex();
+        Integer max = cardListRepository.maxOrderIndex(board);
         max = max == null ? -1 : max;
 
         CardList res = CardList.builder()

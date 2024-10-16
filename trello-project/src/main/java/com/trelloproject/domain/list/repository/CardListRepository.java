@@ -21,8 +21,8 @@ public interface CardListRepository extends JpaRepository<CardList, Long> {
     @Query("SELECT cl FROM CardList cl WHERE cl.board=:board ORDER BY cl.orderIndex")
     List<CardList> findAllByBoardOrderByOrderWithWriteLock(@Param("board") Board board);
 
-    @Query("SELECT max(cl.orderIndex) FROM CardList cl")
-    Integer maxOrderIndex();
+    @Query("SELECT max(cl.orderIndex) FROM CardList cl WHERE cl.board=:board")
+    Integer maxOrderIndex(@Param("board") Board board);
 
     @Modifying
     @Query("UPDATE CardList cl SET cl.orderIndex = cl.orderIndex + :dir WHERE cl.id IN :cardListIds")

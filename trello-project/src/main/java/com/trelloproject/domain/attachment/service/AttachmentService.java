@@ -42,38 +42,23 @@ public class AttachmentService {
     // 파일 저장
     @Transactional
     public ResponseDto<AttachmentResponse> saveFile(AuthUser authUser, Long cardId, MultipartFile file) throws IOException {
-        Member member = memberRepository.findByUserId(authUser.getUserId())
-                .orElseThrow(MemberNotFoundException::new);
+        Member member = validateMember(authUser);
+        Card card = validateCard(cardId);
 
-        if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
-        }
-
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
-
-        // 파일 형식 및 크기 검사
-        if (!SUPPORTED_FILE_TYPES.contains(file.getContentType())) {
-            return ResponseDto.of(HttpStatus.BAD_REQUEST, "지원되지 않는 파일 형식입니다.");
-        }
-
-        if (file.getSize() > MAX_FILE_SIZE) {
-            return ResponseDto.of(HttpStatus.BAD_REQUEST, "파일 크기가 5MB를 초과합니다.");
-        }
+        validateFileTypeAndSize(file);
 
         // 파일 저장
         S3UploadResponse s3UploadResponse = s3Service.uploadFile(file);
         Attachment attachment = new Attachment(s3UploadResponse.getS3Url(), s3UploadResponse.getS3Key(), card);
         attachmentRepository.save(attachment);
-        AttachmentResponse response = new AttachmentResponse(attachment);
 
+        AttachmentResponse response = new AttachmentResponse(attachment);
         return ResponseDto.of(HttpStatus.OK, "파일이 성공적으로 업로드되었습니다.", response);
     }
 
     // 첨부파일 조회
     public ResponseDto<List<AttachmentResponse>> getFiles(Long cardId) {
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
+        Card card = validateCard(cardId);
 
         List<Attachment> attachments = attachmentRepository.findAllByCard(card);
         List<AttachmentResponse> response = attachments.stream()
@@ -86,25 +71,52 @@ public class AttachmentService {
     // 첨부파일 삭제
     @Transactional
     public ResponseDto<Void> deleteFile(AuthUser authUser, Long cardId, Long fileId) {
-        Member member = memberRepository.findByUserId(authUser.getUserId())
-                .orElseThrow(MemberNotFoundException::new);
+        Member member = validateMember(authUser);
+        Card card = validateCard(cardId);
 
-        if(member.getRole() == MemberRole.READ_ONLY) {
-            throw new AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
-        }
-
-        if (!cardRepository.existsById(cardId)) {
-            throw new IllegalArgumentException("잘못된 cardId 입니다.");
-        }
         Attachment attachment = attachmentRepository.findById(fileId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 파일 ID 입니다."));
-        
-        // s3key 있으면 s3에서 삭제
-        if(StringUtils.hasText(attachment.getS3Key())) {
-            s3Service.deleteFile(attachment.getS3Key());
-        }
+
+        // S3에서 파일 삭제
+        deleteFileFromS3(attachment);
+
+        // 데이터베이스에서 파일 삭제
         attachmentRepository.delete(attachment);
 
-        return ResponseDto.of(HttpStatus.NO_CONTENT, "파일이 성공적으로 삭제되었습니다.");
+        return ResponseDto.of(HttpStatus.OK, "파일이 성공적으로 삭제되었습니다.");
+    }
+
+    // 멤버 유효성 검사
+    private Member validateMember(AuthUser authUser) {
+        Member member = memberRepository.findByUserId(authUser.getUserId())
+                .orElseThrow(MemberNotFoundException::new);
+        if (member.getRole() == MemberRole.READ_ONLY) {
+            throw new AccessDeniedException("읽기 전용 멤버는 해당 작업을 수행할 수 없습니다.");
+        }
+        return member;
+    }
+
+    // 카드 유효성 검사
+    private Card validateCard(Long cardId) {
+        return cardRepository.findById(cardId)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 cardId 입니다."));
+    }
+
+    // 파일 형식 및 크기 유효성 검사
+    private void validateFileTypeAndSize(MultipartFile file) {
+        if (!SUPPORTED_FILE_TYPES.contains(file.getContentType())) {
+            throw new IllegalArgumentException("지원되지 않는 파일 형식입니다.");
+        }
+
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new IllegalArgumentException("파일 크기가 5MB를 초과합니다.");
+        }
+    }
+
+    // S3에서 파일 삭제
+    private void deleteFileFromS3(Attachment attachment) {
+        if (StringUtils.hasText(attachment.getS3Key())) {
+            s3Service.deleteFile(attachment.getS3Key());
+        }
     }
 }

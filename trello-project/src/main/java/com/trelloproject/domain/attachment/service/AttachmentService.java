@@ -91,7 +91,7 @@ public class AttachmentService {
         Long workspaceId = cardRepository.findWithCardListAndBoardAndWorkspaceIdByCardId(cardId);
         Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
-        if (member.getRole() == MemberRole.READ_ONLY) {
+        if (member.getRole() == MemberRole.ROLE_READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 해당 작업을 수행할 수 없습니다.");
         }
         return member;

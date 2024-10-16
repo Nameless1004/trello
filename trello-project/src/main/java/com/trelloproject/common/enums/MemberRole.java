@@ -8,9 +8,9 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum MemberRole {
-    WORKSPACE(Authority.WORKSPACE),
-    BOARD(Authority.BOARD),
-    READ_ONLY(Authority.READ_ONLY);
+    ROLE_WORKSPACE(Authority.WORKSPACE),
+    ROLE_BOARD(Authority.BOARD),
+    ROLE_READ_ONLY(Authority.READ_ONLY);
 
     private final String memberRole;
 

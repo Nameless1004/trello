@@ -2,12 +2,12 @@ package com.trelloproject.domain.board.service;
 
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
-import com.trelloproject.common.exceptions.*;
+import com.trelloproject.common.exceptions.AccessDeniedException;
+import com.trelloproject.common.exceptions.BoardNotFoundException;
+import com.trelloproject.common.exceptions.MemberNotFoundException;
+import com.trelloproject.common.exceptions.WorkspaceNotFounException;
 import com.trelloproject.common.service.S3Service;
-import com.trelloproject.domain.attachment.dto.AttachmentResponse;
 import com.trelloproject.domain.attachment.dto.S3UploadResponse;
-import com.trelloproject.domain.attachment.entity.Attachment;
-import com.trelloproject.domain.board.dto.BoardRequest;
 import com.trelloproject.domain.board.dto.BoardResponse;
 import com.trelloproject.domain.board.entity.Board;
 import com.trelloproject.domain.board.repository.BoardRepository;
@@ -28,7 +28,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -54,7 +53,7 @@ public class BoardService {
                 .orElseThrow(WorkspaceNotFounException::new);
 
         // 로그인하지 않은 멤버가 생성하려는 경우
-        if(authUser == null) {
+        if (authUser == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인을 해주세요.");
         }
 
@@ -62,12 +61,12 @@ public class BoardService {
         Member member = memberRepository.findByUserId(authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        if (member.getRole() == MemberRole.READ_ONLY) {
+        if (member.getRole() == MemberRole.ROLE_READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
         }
 
         // 제목이 비어있는 경우
-        if(title.isBlank()) {
+        if (title.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
         }
 
@@ -78,7 +77,7 @@ public class BoardService {
         if (file != null) {
             // 파일 저장
             try {
-                if(StringUtils.hasText(board.getImageUrl())) {
+                if (StringUtils.hasText(board.getImageUrl())) {
                     s3Service.deleteFile(board.getS3Key());
                 }
                 uploadResponse = s3Service.uploadFile(file);
@@ -87,7 +86,7 @@ public class BoardService {
             }
         } else {
             // multipart file null일 때 s3 저장되어 있으면 파일 삭제
-            if(StringUtils.hasText(board.getImageUrl())) {
+            if (StringUtils.hasText(board.getImageUrl())) {
                 s3Service.deleteFile(board.getS3Key());
             }
         }
@@ -112,7 +111,7 @@ public class BoardService {
                 .orElseThrow(BoardNotFoundException::new);
 
         // 로그인하지 않은 멤버가 수정하려는 경우
-        if(authUser == null) {
+        if (authUser == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인을 해주세요..");
         }
 
@@ -120,12 +119,12 @@ public class BoardService {
         Member member = memberRepository.findByUserId(authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        if (member.getRole() == MemberRole.READ_ONLY) {
+        if (member.getRole() == MemberRole.ROLE_READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
         }
 
         // 제목이 비어있는 경우
-        if(title.isBlank()) {
+        if (title.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
         }
 
@@ -134,7 +133,7 @@ public class BoardService {
         if (file != null) {
             // 파일 저장
             try {
-                if(StringUtils.hasText(board.getImageUrl())) {
+                if (StringUtils.hasText(board.getImageUrl())) {
                     s3Service.deleteFile(board.getS3Key());
                 }
                 uploadResponse = s3Service.uploadFile(file);
@@ -143,7 +142,7 @@ public class BoardService {
             }
         } else {
             // multipart file null일 때 s3 저장되어 있으면 파일 삭제
-            if(StringUtils.hasText(board.getImageUrl())) {
+            if (StringUtils.hasText(board.getImageUrl())) {
                 s3Service.deleteFile(board.getS3Key());
             }
         }
@@ -212,7 +211,7 @@ public class BoardService {
         Member member = memberRepository.findByUserId(authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        if (member.getRole() == MemberRole.READ_ONLY) {
+        if (member.getRole() == MemberRole.ROLE_READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 삭제할 수 없습니다.");
         }
 

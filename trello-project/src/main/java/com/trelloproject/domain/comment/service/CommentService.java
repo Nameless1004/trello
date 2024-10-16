@@ -74,7 +74,7 @@ public class CommentService {
         Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        if (member.getRole().equals(MemberRole.READ_ONLY)) {
+        if (member.getRole().equals(MemberRole.ROLE_READ_ONLY)) {
             throw new AccessDeniedException("읽기 전용 멤버는 작업을 수행할 수 없습니다.");
         }
 

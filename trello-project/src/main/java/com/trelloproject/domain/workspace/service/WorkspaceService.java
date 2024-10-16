@@ -76,11 +76,11 @@ public class WorkspaceService {
     // 추가하려는 멤버의 역할이 WORKSPACE이면 -> 멤버 추가 권한 없음 (ADMIN만 WORKSPACE로 추가 가능함)
     // 현제 유저의 멤버 역할이 WORKSPACE이면 -> 멤버 추가 권한 있음
     public boolean hasPermissionToAddMember(Long workspaceId, WorkspaceRequest.AddMember addMemberRequestDto, AuthUser authUser) {
-        if (addMemberRequestDto.memberRole().equals(MemberRole.WORKSPACE)) return false;
+        if (addMemberRequestDto.memberRole().equals(MemberRole.ROLE_WORKSPACE)) return false;
 
         try {
             Member authMember = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId()).orElseThrow(() -> new InvalidRequestException("해당하는 멤버가 존재하지 않습니다."));
-            return authMember.getRole().equals(MemberRole.WORKSPACE);
+            return authMember.getRole().equals(MemberRole.ROLE_WORKSPACE);
         } catch (InvalidRequestException e) {
             return false;
         }
@@ -92,10 +92,10 @@ public class WorkspaceService {
     public boolean hasPermissionToDeleteMember(Long workspaceId, Long memberId, AuthUser authUser) {
         try {
             Member member = memberRepository.findByWorkspace_IdAndId(workspaceId, memberId).orElseThrow(() -> new InvalidRequestException("해당하는 멤버가 존재하지 않습니다."));
-            if (member.getRole().equals(MemberRole.WORKSPACE)) return false;
+            if (member.getRole().equals(MemberRole.ROLE_WORKSPACE)) return false;
 
             Member authMember = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId()).orElseThrow(() -> new InvalidRequestException("해당하는 멤버가 존재하지 않습니다."));
-            return authMember.getRole().equals(MemberRole.WORKSPACE);
+            return authMember.getRole().equals(MemberRole.ROLE_WORKSPACE);
         } catch (InvalidRequestException e) {
             return false;
         }
@@ -107,6 +107,10 @@ public class WorkspaceService {
     }
 
     public boolean hasPermissionToModifyWorkspace(Long workspaceId, AuthUser authUser) {
-        return memberRepository.existsByWorkspace_IdAndUser_IdAndRole(workspaceId, authUser.getUserId(), MemberRole.WORKSPACE);
+        return memberRepository.existsByWorkspace_IdAndUser_IdAndRole(workspaceId, authUser.getUserId(), MemberRole.ROLE_WORKSPACE);
+    }
+
+    public boolean hasPermissionToAccessWorkspace(Long workspaceId, AuthUser authUser) {
+        return memberRepository.existsByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId());
     }
 }

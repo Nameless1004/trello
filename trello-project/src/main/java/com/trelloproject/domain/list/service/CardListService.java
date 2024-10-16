@@ -62,21 +62,18 @@ public class CardListService {
      */
     public ResponseDto<Long> createList(AuthUser authUser, long workspaceId, long boardId, Create request) {
 
-        if(!memberRepository.existsByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())){
-            throw new AccessDeniedException("접근 권한이 없습니다.");
-        }
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
+            .orElseThrow(MemberNotFoundException::new);
 
         Board board = boardRepository.findById(boardId)
             .orElseThrow(BoardNotFoundException::new);
 
-        Member member = memberRepository.findByUserId(authUser.getUserId())
-            .orElseThrow(MemberNotFoundException::new);
 
         if(member.getRole() == MemberRole.READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
         }
 
-        Integer max = cardListRepository.maxOrderIndex();
+        Integer max = cardListRepository.maxOrderIndex(board);
         max = max == null ? -1 : max;
 
         CardList res = CardList.builder()

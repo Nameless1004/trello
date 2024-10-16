@@ -27,7 +27,7 @@ public class BoardController {
      * @param request
      * @return
      */
-    @PostMapping("")
+    @PostMapping("/workspaces/{workspaceId}/boards")
     public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> createdBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                                 @RequestBody long workspaceId,
                                                                                 @RequestPart("file") MultipartFile file,
@@ -44,7 +44,7 @@ public class BoardController {
      * @param request
      * @return
      */
-    @PutMapping("")
+    @PutMapping("/workspaces/{workspaceId}/boards/{boardId}")
     public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
                                                                                 @RequestBody long workspaceId,
                                                                                 @RequestBody long boardId,

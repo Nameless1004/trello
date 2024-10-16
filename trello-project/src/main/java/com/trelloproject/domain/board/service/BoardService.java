@@ -5,6 +5,7 @@ import com.trelloproject.common.enums.MemberRole;
 import com.trelloproject.common.exceptions.*;
 import com.trelloproject.common.service.S3Service;
 import com.trelloproject.domain.attachment.dto.AttachmentResponse;
+import com.trelloproject.domain.attachment.dto.S3UploadResponse;
 import com.trelloproject.domain.attachment.entity.Attachment;
 import com.trelloproject.domain.board.dto.BoardRequest;
 import com.trelloproject.domain.board.dto.BoardResponse;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,6 +33,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BoardService {
 
     private final BoardRepository boardRepository;
@@ -62,22 +65,36 @@ public class BoardService {
             throw new AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
         }
 
-        String fileUrl = null;
-        if (file != null) {
-            // 파일 저장
-            try {
-                fileUrl = s3Service.uploadFile(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         // 제목이 비어있는 경우
         if(title.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
         }
 
-        Board board = new Board(workspace, title, bgColor, fileUrl);
+        S3UploadResponse uploadResponse = null;
+
+
+
+        Board board = new Board(workspace, title, bgColor);
+
+        if (file != null) {
+            // 파일 저장
+            try {
+                if(StringUtils.hasText(board.getImageUrl())) {
+                    s3Service.deleteFile(board.getS3Key());
+                }
+
+                uploadResponse = s3Service.uploadFile(file);
+            } catch (IOException e) {
+                throw new RuntimeException("file upload failed.", e);
+            }
+        } else {
+            // multipart file null일 때 s3 저장되어 있으면 파일 삭제
+            if(StringUtils.hasText(board.getImageUrl())) {
+                s3Service.deleteFile(board.getS3Key());
+            }
+        }
+
+        board.setImageUrlAndKey(uploadResponse);
         boardRepository.save(board);
 
         return ResponseDto.of(HttpStatus.CREATED, "보드 생성에 성공했습니다.", new BoardResponse.CreatedBoard(board.getId(), board.getTitle(), board.getBgColor(), board.getImageUrl()));

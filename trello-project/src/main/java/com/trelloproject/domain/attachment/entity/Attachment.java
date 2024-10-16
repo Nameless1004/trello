@@ -13,13 +13,15 @@ public class Attachment {
     private Long id;
 
     private String s3Url;
+    private String s3Key;
 
     @ManyToOne
     @JoinColumn(name = "card_id")
     private Card card;
 
-    public Attachment(String s3Url, Card card) {
+    public Attachment(String s3Url, String s3Key, Card card) {
         this.s3Url = s3Url;
+        this.s3Key = s3Key;
         this.card = card;
     }
 

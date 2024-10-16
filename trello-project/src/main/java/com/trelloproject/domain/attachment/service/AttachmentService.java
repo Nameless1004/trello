@@ -6,6 +6,7 @@ import com.trelloproject.common.exceptions.AccessDeniedException;
 import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.common.service.S3Service;
 import com.trelloproject.domain.attachment.dto.AttachmentResponse;
+import com.trelloproject.domain.attachment.dto.S3UploadResponse;
 import com.trelloproject.domain.attachment.entity.Attachment;
 import com.trelloproject.domain.attachment.repository.AttachmentRepository;
 import com.trelloproject.domain.card.entity.Card;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -60,8 +62,8 @@ public class AttachmentService {
         }
 
         // 파일 저장
-        String fileUrl = s3Service.uploadFile(file);
-        Attachment attachment = new Attachment(fileUrl, card);
+        S3UploadResponse s3UploadResponse = s3Service.uploadFile(file);
+        Attachment attachment = new Attachment(s3UploadResponse.getS3Url(), s3UploadResponse.getS3Key(), card);
         attachmentRepository.save(attachment);
         AttachmentResponse response = new AttachmentResponse(attachment);
 
@@ -96,7 +98,11 @@ public class AttachmentService {
         }
         Attachment attachment = attachmentRepository.findById(fileId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 파일 ID 입니다."));
-
+        
+        // s3key 있으면 s3에서 삭제
+        if(StringUtils.hasText(attachment.getS3Key())) {
+            s3Service.deleteFile(attachment.getS3Key());
+        }
         attachmentRepository.delete(attachment);
 
         return ResponseDto.of(HttpStatus.NO_CONTENT, "파일이 성공적으로 삭제되었습니다.");

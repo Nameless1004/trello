@@ -74,4 +74,8 @@ public class Card extends Timestamped {
         this.cardList = cardList;
         cardList.getCards().add(this);
     }
+
+    public void setViewCount(Long viewCount) {
+        this.viewCount = viewCount;
+    }
 }

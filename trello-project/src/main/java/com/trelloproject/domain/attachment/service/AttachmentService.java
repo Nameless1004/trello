@@ -3,6 +3,7 @@ package com.trelloproject.domain.attachment.service;
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.common.enums.MemberRole;
 import com.trelloproject.common.exceptions.AccessDeniedException;
+import com.trelloproject.common.exceptions.CardNotFoundException;
 import com.trelloproject.common.exceptions.MemberNotFoundException;
 import com.trelloproject.common.service.S3Service;
 import com.trelloproject.domain.attachment.dto.AttachmentResponse;
@@ -88,8 +89,8 @@ public class AttachmentService {
 
     // 멤버 유효성 검사
     private Member validateMember(AuthUser authUser, Long cardId) {
-        Long workspaceId = cardRepository.findWithCardListAndBoardAndWorkspaceIdByCardId(cardId);
-        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
+        Card workspaceId = cardRepository.findWithCardListAndBoardAndWorkspaceIdByCardId(cardId).orElseThrow(CardNotFoundException::new);
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId.getId(), authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
         if (member.getRole() == MemberRole.ROLE_READ_ONLY) {
             throw new AccessDeniedException("읽기 전용 멤버는 해당 작업을 수행할 수 없습니다.");

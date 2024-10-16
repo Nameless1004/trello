@@ -8,6 +8,7 @@ import com.trelloproject.security.AuthUser;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,13 +35,13 @@ public class CardListController {
     }
 
     @PostMapping("/api/workspaces/{workspaceId}/boards/{boardId}/lists")
-    public void createList(
+    public ResponseEntity<ResponseDto<Long>> createList(
         @AuthenticationPrincipal AuthUser authUser,
         @PathVariable("workspaceId") long workspaceId,
         @PathVariable("boardId") long boardId,
         @Valid @RequestBody ListRequest.Create request) {
 
-        cardListService.createList(authUser, workspaceId, boardId, request);
+        return ResponseDto.toEntity(cardListService.createList(authUser, workspaceId, boardId, request));
     }
 
     @PatchMapping("/api/workspaces/{workspaceId}/boards/{boardId}/lists/{listId}")

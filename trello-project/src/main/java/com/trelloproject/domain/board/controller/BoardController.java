@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class BoardController {
 
     private final BoardService boardService;
@@ -43,15 +44,15 @@ public class BoardController {
      * @param boardId
      * @return
      */
-//    @PutMapping("/workspaces/{workspaceId}/boards/{boardId}")
-//    public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
-//                                                                               @PathVariable long workspaceId,
-//                                                                               @PathVariable long boardId,
-//                                                                               @RequestPart("file") MultipartFile file,
-//                                                                               @RequestPart("title") String title,
-//                                                                               @RequestPart(value = "bgColor", required = false) String bgColor) {
-//        return ResponseDto.toEntity(boardService.updateBoard(authUser, workspaceId, boardId, file, title, bgColor));
-//    }
+    @PutMapping("/workspaces/{workspaceId}/boards/{boardId}")
+    public ResponseEntity<ResponseDto<BoardResponse.CreatedBoard>> updateBoard(@AuthenticationPrincipal AuthUser authUser,
+                                                                               @PathVariable long workspaceId,
+                                                                               @PathVariable long boardId,
+                                                                               @RequestPart("file") MultipartFile file,
+                                                                               @RequestPart("title") String title,
+                                                                               @RequestPart(value = "bgColor", required = false) String bgColor) {
+        return ResponseDto.toEntity(boardService.updateBoard(authUser, workspaceId, boardId, file, title, bgColor));
+    }
 
     /**
      * 보드 다건 조회

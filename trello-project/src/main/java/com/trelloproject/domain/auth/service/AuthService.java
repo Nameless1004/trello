@@ -9,7 +9,7 @@ import com.trelloproject.domain.auth.dto.AuthRequest;
 import com.trelloproject.domain.auth.dto.AuthRequest.Login;
 import com.trelloproject.domain.auth.dto.AuthResponse;
 import com.trelloproject.domain.auth.dto.AuthResponse.DuplicateCheck;
-import com.trelloproject.domain.user.entitiy.User;
+import com.trelloproject.domain.user.entity.User;
 import com.trelloproject.domain.user.repository.UserRepository;
 import com.trelloproject.security.AuthUser;
 import com.trelloproject.security.JwtUtil;

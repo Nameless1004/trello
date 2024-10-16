@@ -56,4 +56,18 @@ public class WorkspaceController {
         workspaceService.deleteMember(workspaceId, memberId);
         return ResponseDto.of(HttpStatus.NO_CONTENT, "멤버가 삭제되었습니다.");
     }
+
+    @DeleteMapping("/workspaces/{workspaceId}")
+    @PreAuthorize("hasRole(T(com.trelloproject.common.enums.UserRole.Authority).ADMIN) or @workspaceService.hasPermissionToModifyWorkspace(#workspaceId, #authUser)")
+    public ResponseDto deleteWorkspace(@PathVariable Long workspaceId, @AuthenticationPrincipal AuthUser authUser) {
+        workspaceService.deleteWorkspace(workspaceId);
+        return ResponseDto.of(HttpStatus.NO_CONTENT, "워크스페이스가 삭제되었습니다.");
+    }
+
+    @PutMapping("/workspaces/{workspaceId}")
+    @PreAuthorize("hasRole(T(com.trelloproject.common.enums.UserRole.Authority).ADMIN) or @workspaceService.hasPermissionToModifyWorkspace(#workspaceId, #authUser)")
+    public ResponseDto<WorkspaceResponse.Workspace> updateWorkspace(@PathVariable Long workspaceId, @AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody WorkspaceRequest.UpdateWorkspace updateWorkspaceRequestDto) {
+        Workspace workspace = workspaceService.updateWorkspace(workspaceId, updateWorkspaceRequestDto.name(), updateWorkspaceRequestDto.description());
+        return ResponseDto.of(HttpStatus.OK, "워크스페이스가 수정되었습니다.", new WorkspaceResponse.Workspace(workspace.getId(), workspace.getName(), workspace.getDescription()));
+    }
 }

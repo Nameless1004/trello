@@ -33,7 +33,8 @@ public class CardList {
     private List<Card> cards = new ArrayList<>();
 
     @Builder
-    public CardList(String title, int order) {
+    public CardList(Board board, String title, int order) {
+        this.board = board;
         this.title = title;
         this.orderIndex = order;
     }

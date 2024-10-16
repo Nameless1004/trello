@@ -42,7 +42,7 @@ public class CardListService {
      */
     public ResponseDto<List<ListResponse.Info>> getLists(long workspaceId, AuthUser authUser, long boardId) {
 
-        if(memberRepository.existsByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())){
+        if(!memberRepository.existsByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())){
             throw new AccessDeniedException("접근 권한이 없습니다.");
         }
 
@@ -80,6 +80,7 @@ public class CardListService {
         max = max == null ? -1 : max;
 
         CardList res = CardList.builder()
+            .board(board)
             .title(request.title())
             .order(max+1)
             .build();

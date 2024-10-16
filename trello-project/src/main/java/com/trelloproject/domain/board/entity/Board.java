@@ -29,14 +29,15 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CardList> lists = new ArrayList<>();
 
-//    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    Attachment attachment;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    Attachment attachment;
 
     public void imageUrl (String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
-    public Board(String title, String bgColor, String imageUrl) {
+    public Board(Workspace workspace, String title, String bgColor, String imageUrl) {
+        this.workspace = workspace;
         this.title = title;
         this.bgColor = bgColor;
         this.imageUrl = imageUrl;

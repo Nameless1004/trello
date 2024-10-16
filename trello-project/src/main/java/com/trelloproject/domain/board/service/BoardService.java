@@ -43,7 +43,7 @@ public class BoardService {
     /**
      * 보드 생성
      */
-    public ResponseDto<BoardResponse.CreatedBoard> createdBoard(AuthUser authUser, long workspaceId, MultipartFile file, BoardRequest.CreatedBoard request) {
+    public ResponseDto<BoardResponse.CreatedBoard> createdBoard(AuthUser authUser, long workspaceId, MultipartFile file, String title, String bgColor) {
 
         // 해당 워크스페이스가 존재하지 않을 때
         Workspace workspace = workspaceRepository.findById(workspaceId)
@@ -62,9 +62,6 @@ public class BoardService {
             throw new AccessDeniedException("읽기 전용 멤버는 생성할 수 없습니다.");
         }
 
-        String title = request.title();
-        String bgColor = request.bgColor();
-
         String fileUrl = null;
         if (file != null) {
             // 파일 저장
@@ -80,51 +77,58 @@ public class BoardService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
         }
 
-        Board board = new Board(title, bgColor, fileUrl);
+        Board board = new Board(workspace, title, bgColor, fileUrl);
         boardRepository.save(board);
 
-        return ResponseDto.of(HttpStatus.CREATED, "보드 생성에 성공했습니다.", new BoardResponse.CreatedBoard(board.getId(), board.getTitle(), board.getBgColor()));
+        return ResponseDto.of(HttpStatus.CREATED, "보드 생성에 성공했습니다.", new BoardResponse.CreatedBoard(board.getId(), board.getTitle(), board.getBgColor(), board.getImageUrl()));
     }
 
     /**
      * 보드 수정
      */
-    public ResponseDto<BoardResponse.CreatedBoard> updateBoard(AuthUser authUser, long workspaceId, long boardId, BoardRequest.UpdateBoard request) {
-
-        // 해당 워크스페이스가 존재하지 않을 때
-        Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(WorkspaceNotFounException::new);
-
-        // 해당 보드가 존재하지 않을 때
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(BoardNotFoundException::new);
-
-        // 로그인하지 않은 멤버가 수정하려는 경우
-        if(authUser == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인을 해주세요..");
-        }
-
-        // 읽기 전용 역할을 가진 멤버가 보드를 수정하려는 경우
-        Member member = memberRepository.findByUserId(authUser.getUserId())
-                .orElseThrow(MemberNotFoundException::new);
-
-        if (member.getRole() == MemberRole.READ_ONLY) {
-            throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
-        }
-
-        String title = request.title();
-        String bgColor = request.bgColor();
-
-        // 제목이 비어있는 경우
-        if(title.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
-        }
-
-        board.update(title, bgColor);
-        boardRepository.save(board);
-
-        return ResponseDto.of(HttpStatus.OK, "보드 수정이 완료되었습니다.", new BoardResponse.CreatedBoard(board.getId(), board.getTitle(), bgColor));
-    }
+//    public ResponseDto<BoardResponse.CreatedBoard> updateBoard(AuthUser authUser, long workspaceId, long boardId, MultipartFile file, String title, String bgColor) {
+//
+//        // 해당 워크스페이스가 존재하지 않을 때
+//        Workspace workspace = workspaceRepository.findById(workspaceId)
+//                .orElseThrow(WorkspaceNotFounException::new);
+//
+//        // 해당 보드가 존재하지 않을 때
+//        Board board = boardRepository.findById(boardId)
+//                .orElseThrow(BoardNotFoundException::new);
+//
+//        // 로그인하지 않은 멤버가 수정하려는 경우
+//        if(authUser == null) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인을 해주세요..");
+//        }
+//
+//        // 읽기 전용 역할을 가진 멤버가 보드를 수정하려는 경우
+//        Member member = memberRepository.findByUserId(authUser.getUserId())
+//                .orElseThrow(MemberNotFoundException::new);
+//
+//        if (member.getRole() == MemberRole.READ_ONLY) {
+//            throw new AccessDeniedException("읽기 전용 멤버는 수정할 수 없습니다.");
+//        }
+//
+//        // 제목이 비어있는 경우
+//        if(title.isBlank()) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요.");
+//        }
+//
+//        String fileUrl = board.getImageUrl();
+//
+//        if (file != null) {
+//            try {
+//                if (fileUrl != null) {
+//                    s3Service.putS3(fileUrl);
+//                }
+//            }
+//        }
+//
+//        board.update(title, bgColor, fileUrlRequest);
+//        boardRepository.save(board);
+//
+//        return ResponseDto.of(HttpStatus.OK, "보드 수정이 완료되었습니다.", new BoardResponse.CreatedBoard(board.getId(), board.getTitle(), bgColor));
+//    }
 
     /**
      * 보드 다건 조회

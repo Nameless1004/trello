@@ -58,6 +58,7 @@ public class CardService {
     }
 
     // 카드 조회수 증가 및 조회
+    @Transactional
     public ResponseDto<CardResponse> getCardDetails(AuthUser authUser, Long listId, Long cardId) {
         findByIdOrThrow(cardListRepository, listId, "card list");
         Card card = findByIdOrThrow(cardRepository, cardId, "card");

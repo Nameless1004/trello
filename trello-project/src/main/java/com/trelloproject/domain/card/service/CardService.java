@@ -16,9 +16,9 @@ import com.trelloproject.domain.member.entity.Member;
 import com.trelloproject.domain.member.repository.MemberRepository;
 import com.trelloproject.security.AuthUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,6 @@ import java.util.stream.Collectors;
 public class CardService {
 
     private final CardRepository cardRepository;
-    @Qualifier("sentinelRedisTemplate")  // Sentinel Redis를 사용
     private final RedisTemplate<String, Object> redisTemplate;
     private final CardListRepository cardListRepository;
     private final MemberRepository memberRepository;
@@ -57,7 +57,6 @@ public class CardService {
     }
 
     // 카드 조회수 증가 및 조회
-    @Transactional
     public ResponseDto<CardResponse> getCardDetails(AuthUser authUser, Long listId, Long cardId) {
         findByIdOrThrow(cardListRepository, listId, "card list");
         Card card = findByIdOrThrow(cardRepository, cardId, "card");
@@ -65,10 +64,22 @@ public class CardService {
         String redisKey = "card:viewcount:" + cardId;
         incrementViewCount(redisKey, authUser.getUserId().toString());
 
+        // Redis에서 조회수 가져오기
         Long viewCount = redisTemplate.opsForValue().increment(redisKey, 0);
-        card.setViewCount(viewCount);
+        card.setViewCount(viewCount); // 엔티티의 조회수 업데이트
+
+        // 랭킹 업데이트 (Sorted Set에 추가)
+        updateRanking(cardId, viewCount); // 랭킹 업데이트 메서드 호출
+
         CardResponse cardResponse = new CardResponse(card);
         return ResponseDto.of(HttpStatus.OK, "카드 조회를 성공했습니다", cardResponse);
+    }
+
+    // 랭킹 업데이트
+    private void updateRanking(Long cardId, Long viewCount) {
+        String rankingKey = "card:ranking";
+        // Sorted Set에 카드 ID와 조회수 추가 (조회수 업데이트)
+        redisTemplate.opsForZSet().add(rankingKey, cardId, viewCount);
     }
 
     private void incrementViewCount(String redisKey, String userId) {
@@ -86,12 +97,21 @@ public class CardService {
     public List<CardResponse> getTopCards() {
         String rankingKey = "card:ranking";
 
-        // Redis에서 인기 카드 ID 리스트 가져오기
-        List<Object> topCardIds = redisTemplate.opsForList().range(rankingKey, 0, 9);
+        // Redis에서 인기 카드 ID 리스트 가져오기 (조회수 기준 내림차순)
+        Set<ZSetOperations.TypedTuple<Object>> topCardIdsWithScores = redisTemplate.opsForZSet()
+                .reverseRangeWithScores(rankingKey, 0, 9);
 
-        List<CardResponse> topCards = topCardIds.stream()
-                .map(cardId -> {
-                    Card card = findByIdOrThrow(cardRepository, (Long) cardId, "card");
+        if (topCardIdsWithScores == null || topCardIdsWithScores.isEmpty()) {
+            return Collections.emptyList(); // 랭킹에 데이터가 없는 경우 빈 리스트 반환
+        }
+
+        // 카드와 조회수를 함께 반환
+        List<CardResponse> topCards = topCardIdsWithScores.stream()
+                .map(tuple -> {
+                    Long cardId = Long.valueOf(tuple.getValue().toString());
+                    Double score = tuple.getScore(); // 조회수
+                    Card card = findByIdOrThrow(cardRepository, cardId, "card");
+                    card.setViewCount(score != null ? score.longValue() : 0L); // 조회수를 설정
                     return new CardResponse(card);
                 })
                 .collect(Collectors.toList());

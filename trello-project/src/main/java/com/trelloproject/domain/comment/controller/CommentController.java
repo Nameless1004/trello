@@ -5,6 +5,7 @@ import com.trelloproject.domain.comment.dto.CommentRequest;
 import com.trelloproject.domain.comment.dto.CommentResponse;
 import com.trelloproject.domain.comment.service.CommentService;
 import com.trelloproject.security.AuthUser;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
+
+    @GetMapping
+    public ResponseEntity<ResponseDto<List<CommentResponse>>> getComments(
+        @AuthenticationPrincipal AuthUser authUser,
+        @PathVariable Long cardId) {
+
+        return commentService.getComments(authUser, cardId).toEntity();
+    }
 
     // 댓글 작성
     @PostMapping

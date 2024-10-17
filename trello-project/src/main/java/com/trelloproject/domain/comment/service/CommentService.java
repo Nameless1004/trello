@@ -14,6 +14,7 @@ import com.trelloproject.domain.comment.repository.CommentRepository;
 import com.trelloproject.domain.member.entity.Member;
 import com.trelloproject.domain.member.repository.MemberRepository;
 import com.trelloproject.security.AuthUser;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -96,5 +97,9 @@ public class CommentService {
     private <T> T findByIdOrThrow(JpaRepository<T, Long> repository, Long id, String entityName) {
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 " + entityName + " ID 입니다."));
+    }
+
+    public ResponseDto<List<CommentResponse>> getComments(AuthUser authUser, Long cardId) {
+        return ResponseDto.of(HttpStatus.OK, commentRepository.findAllByCardId(cardId).stream().map(CommentResponse::new).toList());
     }
 }

@@ -16,6 +16,7 @@ import com.trelloproject.domain.member.entity.Member;
 import com.trelloproject.domain.member.repository.MemberRepository;
 import com.trelloproject.security.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -86,7 +87,7 @@ public class CardService {
         String userKey = redisKey + ":user:" + userId;
 
         if (Boolean.TRUE.equals(redisTemplate.hasKey(userKey))) {
-            return;
+            return; // 이미 조회한 사용자
         }
 
         redisTemplate.opsForValue().increment(redisKey);
@@ -94,6 +95,7 @@ public class CardService {
     }
 
     // 인기 카드 랭킹 관리
+    @Cacheable(value = "topCardsCache", key = "'topCards'") // 캐시를 위한 어노테이션 추가
     public List<CardResponse> getTopCards() {
         String rankingKey = "card:ranking";
 
@@ -133,6 +135,9 @@ public class CardService {
 
         // 랭킹 캐시 리셋
         redisTemplate.delete("card:ranking");
+
+        // 인기 카드 캐시 리셋
+        redisTemplate.delete("topCardsCache::topCards"); // 캐시 리셋 추가
     }
 
     @Transactional

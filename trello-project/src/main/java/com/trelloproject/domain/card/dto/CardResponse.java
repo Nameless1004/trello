@@ -1,5 +1,6 @@
 package com.trelloproject.domain.card.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.trelloproject.common.enums.CardStatus;
 import com.trelloproject.domain.attachment.entity.Attachment;
 import com.trelloproject.domain.card.entity.Card;
@@ -17,6 +18,7 @@ public class CardResponse {
     private Long cardId;
     private String title;
     private String description;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate deadline;
     private CardStatus status;
     private List<ManagerResponse> managers;  // 매니저 정보를 ManagerResponse로 반환

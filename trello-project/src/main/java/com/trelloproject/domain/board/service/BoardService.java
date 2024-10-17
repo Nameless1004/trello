@@ -58,7 +58,7 @@ public class BoardService {
         }
 
         // 읽기 전용 역할을 가진 멤버가 보드를 생성하려는 경우
-        Member member = memberRepository.findByUserId(authUser.getUserId())
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
         if (member.getRole() == MemberRole.ROLE_READ_ONLY) {
@@ -116,7 +116,7 @@ public class BoardService {
         }
 
         // 읽기 전용 역할을 가진 멤버가 보드를 수정하려는 경우
-        Member member = memberRepository.findByUserId(authUser.getUserId())
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
         if (member.getRole() == MemberRole.ROLE_READ_ONLY) {
@@ -208,7 +208,7 @@ public class BoardService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "보드를 찾을 수 없습니다."));
 
         // 읽기 전용 역할을 가진 멤버가 보드를 삭제하려는 경우
-        Member member = memberRepository.findByUserId(authUser.getUserId())
+        Member member = memberRepository.findByWorkspace_IdAndUser_Id(workspaceId, authUser.getUserId())
                 .orElseThrow(MemberNotFoundException::new);
 
         if (member.getRole() == MemberRole.ROLE_READ_ONLY) {

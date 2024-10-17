@@ -1,11 +1,12 @@
 package com.trelloproject.common.exceptions;
 
 import com.trelloproject.common.dto.ErrorResponse;
-import java.rmi.ServerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.rmi.ServerException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,6 +34,13 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         return getErrorResponse(status, ex.getMessage());
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return getErrorResponse(status, ex.getMessage());
+    }
+
 
     public ResponseEntity<ErrorResponse> getErrorResponse(HttpStatus status, String message) {
         return new ResponseEntity<>(new ErrorResponse(status, message), status);

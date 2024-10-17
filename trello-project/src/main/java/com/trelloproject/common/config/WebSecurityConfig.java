@@ -1,5 +1,6 @@
 package com.trelloproject.common.config;
 
+import com.trelloproject.security.RoleFilter;
 import com.trelloproject.security.SecurityFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ public class WebSecurityConfig {
 
     private final SecurityFilter securityFilter;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final RoleFilter roleFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,6 +33,7 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // SessionManagementFilter, SecurityContextPersistenceFilter
                 )
                 .addFilterBefore(securityFilter, SecurityContextHolderAwareRequestFilter.class)
+                .addFilterAfter(roleFilter, SecurityContextHolderAwareRequestFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable) // UsernamePasswordAuthenticationFilter, DefaultLoginPageGeneratingFilter 비활성화
                 .anonymous(AbstractHttpConfigurer::disable) // AnonymousAuthenticationFilter 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable) // BasicAuthenticationFilter 비활성화

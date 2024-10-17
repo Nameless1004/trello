@@ -20,11 +20,11 @@ public class UserController {
 
     private final UserService userService;
 
-    @DeleteMapping("/api/users/{userId}")
+    @DeleteMapping("/users/{userId}")
     public ResponseEntity<ResponseDto<Void>> deleteUsers(
-        @PathVariable("userId") long userId,
-        @AuthenticationPrincipal AuthUser authUser,
-        @Valid @RequestBody UserRequest.Delete request) {
+            @PathVariable("userId") long userId,
+            @AuthenticationPrincipal AuthUser authUser,
+            @Valid @RequestBody UserRequest.Delete request) {
         userService.deleteUser(userId, authUser, request);
         return ResponseDto.toEntity(ResponseDto.of(HttpStatus.OK, "회원탈퇴되었습니다."));
     }

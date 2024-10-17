@@ -1,5 +1,6 @@
 package com.trelloproject.domain.search.service;
 
+import com.trelloproject.common.annotations.ExecutionTimeLog;
 import com.trelloproject.common.dto.ResponseDto;
 import com.trelloproject.domain.card.repository.CardRepository;
 import com.trelloproject.domain.search.dto.CardSearchDto;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class CardSearchService {
     private final CardRepository cardRepository;
 
+    @ExecutionTimeLog
     @Transactional(readOnly = true)
     public ResponseDto<Page<CardSearchDto.CardSearchResult>> searchCards(CardSearchDto.CardSearch request, long boardId, Pageable pageable) {
         Page<CardSearchDto.CardSearchResult> cards = cardRepository.searchCards(request, boardId, pageable);

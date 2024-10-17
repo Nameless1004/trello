@@ -19,12 +19,6 @@ spring:
         format_sql: true
         show_sql: true
         use_sql_comments: true
-  data:
-    redis:
-      sentinel:
-        master: ${REDIS_SENTINEL_MASTER}
-        nodes: ${REDIS_SENTINEL_NODES}
-      # password: ${REDIS_PASSWORD:password}
 s3:
   credentials:
     access-key: ${S3_CREDENTIALS_ACCESS_KEY}

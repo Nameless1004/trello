@@ -62,5 +62,21 @@
 # 성능 개선
 
 # 트러블 슈팅
+### 1. **배경**
 
+- Redis와 Spring Boot를 사용하여 캐시를 설정 중, `LocalDate` 및 `LocalDateTime` 타입의 직렬화 문제로 인해 캐시 조회 시 오류가 발생했습니다.
+
+### 2. **발단**
+
+- `LocalDate`와 `LocalDateTime`은 Jackson 라이브러리에서 기본적으로 직렬화가 지원되지 않아 `Could not write JSON` 오류가 발생했습니다. 이는 Java 8 날짜 API와 관련된 문제였습니다.
+
+### 3. **전개**
+
+- 문제 해결을 위해 Jackson 모듈 의존성(`jackson-datatype-jsr310`)을 추가하고, `@JsonFormat` 어노테이션을 사용해 날짜 직렬화를 시도했습니다. 또한, ModuleConfig 파일을 추가해`ObjectMapper`를 만들어 `JavaTimeModule`을 등록했으나 문제는 지속되었습니다.
+
+### 4. **위기**
+
+- `CacheManager`에서 JSON 직렬화 처리가 잘못되었다는 점을 쉽게 발견하지 못했고, 원인을 찾기 어려운 상황이었습니다. `GenericJackson2JsonRedisSerializer`를 이미 사용 중이었기 때문에 문제가 캐시 설정과 관련이 있다고 생각하지 않았습니다.
+
+### 문제가 되던 원래 코드:
 

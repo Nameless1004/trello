@@ -6,22 +6,22 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
         show_sql: true
         use_sql_comments: true
-#server:
-#  servlet:
-#    encoding:
-#      charset: utf-8
-#      force: true
-#jwt:
-#  secret:
-#    key: ${JWT_TOKEN}
-#admin:
-#  token: ${ADMINTOKEN}
+s3:
+  credentials:
+    access-key: ${S3_CREDENTIALS_ACCESS_KEY}
+    secret-key: ${S3_CREDENTIALS_SECRET_KEY}
+    region: ${S3_credentials_REGION}
+  bucket: ${S3_BUCKET}

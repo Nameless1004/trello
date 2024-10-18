@@ -9,7 +9,7 @@ import com.trelloproject.domain.auth.dto.AuthRequest;
 import com.trelloproject.domain.auth.dto.AuthRequest.Login;
 import com.trelloproject.domain.auth.dto.AuthResponse;
 import com.trelloproject.domain.auth.dto.AuthResponse.DuplicateCheck;
-import com.trelloproject.domain.user.entitiy.User;
+import com.trelloproject.domain.user.entity.User;
 import com.trelloproject.domain.user.repository.UserRepository;
 import com.trelloproject.security.AuthUser;
 import com.trelloproject.security.JwtUtil;
@@ -46,6 +46,10 @@ public class AuthService {
      * @return
      */
     public ResponseDto<AuthResponse.Signup> signup(AuthRequest.Signup request) {
+        if(!request.password().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]{8,}$")) {
+            throw new InvalidRequestException("비밀번호는 대소문자 포함 영문 + 숫자 + 특수문자를 최소 1글자씩 포함해야하며 최소 8글자 이상이어야 합니다.");
+        }
+
         if(request.userRole() == UserRole.ROLE_ADMIN) {
             if( !StringUtils.hasText(request.adminToken()) || !request.adminToken().equals(adminToken)) {
                 throw new AuthException("관리자 권한이 없습니다.");
@@ -86,6 +90,10 @@ public class AuthService {
      */
     public ResponseDto<AuthResponse.Login> login(Login request) {
         User user = userRepository.findByUsername(request.username()).orElseThrow(()-> new InvalidRequestException("아이디 또는 비밀번호가 잘못되었습니다."));
+
+        if(user.isDeleted()) {
+            throw new InvalidRequestException("탈퇴한 회원입니다.");
+        }
 
         if(!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new InvalidRequestException("아이디 또는 비밀번호가 잘못되었습니다.");

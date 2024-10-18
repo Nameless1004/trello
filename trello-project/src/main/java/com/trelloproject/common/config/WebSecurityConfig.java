@@ -1,5 +1,6 @@
 package com.trelloproject.common.config;
 
+import com.trelloproject.security.RoleFilter;
 import com.trelloproject.security.SecurityFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,31 +19,32 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity // Spring Security 지원을 가능하게 함
-@EnableMethodSecurity(securedEnabled  = true) // @Secured 사용가능하게
+@EnableMethodSecurity(securedEnabled = true) // @Secured 사용가능하게
 public class WebSecurityConfig {
 
     private final SecurityFilter securityFilter;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final RoleFilter roleFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // SessionManagementFilter, SecurityContextPersistenceFilter
-            )
-            .addFilterBefore(securityFilter, SecurityContextHolderAwareRequestFilter.class)
-            .formLogin(AbstractHttpConfigurer::disable) // UsernamePasswordAuthenticationFilter, DefaultLoginPageGeneratingFilter 비활성화
-            .anonymous(AbstractHttpConfigurer::disable) // AnonymousAuthenticationFilter 비활성화
-            .httpBasic(AbstractHttpConfigurer::disable) // BasicAuthenticationFilter 비활성화
-            .logout(AbstractHttpConfigurer::disable) // LogoutFilter 비활성화
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue").permitAll()
-                .requestMatchers("/auth/logout").authenticated()
-                .anyRequest().authenticated()
-            );
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // SessionManagementFilter, SecurityContextPersistenceFilter
+                )
+                .addFilterBefore(securityFilter, SecurityContextHolderAwareRequestFilter.class)
+                .addFilterAfter(roleFilter, SecurityContextHolderAwareRequestFilter.class)
+                .formLogin(AbstractHttpConfigurer::disable) // UsernamePasswordAuthenticationFilter, DefaultLoginPageGeneratingFilter 비활성화
+                .anonymous(AbstractHttpConfigurer::disable) // AnonymousAuthenticationFilter 비활성화
+                .httpBasic(AbstractHttpConfigurer::disable) // BasicAuthenticationFilter 비활성화
+                .logout(AbstractHttpConfigurer::disable) // LogoutFilter 비활성화
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue", "/error").permitAll()
+                        .anyRequest().authenticated());
 
         http.cors(c -> {
-            c.configurationSource(corsConfigurationSource);});
+            c.configurationSource(corsConfigurationSource);
+        });
 
         return http.build();
     }

@@ -9,6 +9,7 @@ import com.trelloproject.domain.auth.dto.AuthRequest.Signup;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public sealed interface AuthRequest permits Signup, Login, CheckNickname, CheckEmail,
     CheckUsername {

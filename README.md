@@ -224,3 +224,22 @@ public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) 
 ```		
 </div>
 </details>
+
+<details>
+<summary><h2>파일 업로드 트러블 슈팅</h2></summary>
+<div markdown="1">
+
+### 배경&발단
+보드 생성 시 파일 업로드 기능을 추가했고, 파일이 있을 경우 S3에 업로드하여 반환된 fileUrl을 게시판의 이미지 URL로 설정했습니다.
+하지만 이 과정에서 S3key가 누락되어 파일을 삭제하거나 관리하는 데 어려움이 발생했습니다.
+
+### 전개&위기
+imageUrl만 저장하고 있었기 때문에, s3에서 파일을 삭제할 수 없었습니다.
+이를 해결하기 위해 S3Key를 추가로 저장하게 되었습니다.
+
+### 절정
+최종적으로 S3Key를 저장하는 로직을 추가함으로써, 파일 삭제 시 정확한 파일을 삭제할 수 있게 되었으며,
+이후에도 S3에 저장된 파일을 관리하는 데 필요한 정보를 확보할 수 있게 되었습니다.
+</div>
+</details>
+

@@ -90,6 +90,96 @@
 </details>
 
 <details>
+<summary><h3>슬랙 실시간 알림</h3></summary>
+<div markdown="1">
+
+- 스프링 ApplicationEventPublisher로 특정 이벤트 발생 시 슬랙으로 알림이 가도록 구현
+- AOP로 알림 기능 구현
+<details>
+<summary>AOP코드</summary>
+<div markdown="1">
+	
+```java
+@Component
+@Aspect
+@RequiredArgsConstructor
+public class SlackAlertAop {
+    @Value("${DEFAULT_SLACK_WEBHOOK_URL}")
+    private String defaultSlackWebhookUrl;  // 여기에서 설정 값 주입
+
+    private final SlackClient slackClient;
+
+    @Pointcut("@annotation(com.trelloproject.common.annotations.SlackAlert)")
+    public void annotaionPc(){}
+
+    @Around("annotaionPc()")
+    public Object slackAlertAround(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        boolean isExceptionOccurred = false;
+        long startTime = System.currentTimeMillis();
+        Exception exception = null;
+
+        try {
+            return joinPoint.proceed();
+        } catch (Exception e) {
+            isExceptionOccurred = true;
+            exception = e;
+            throw e;
+        } finally {
+            Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+            SlackAlert annotation = method.getAnnotation(SlackAlert.class);
+            String webhookUrl = StringUtils.hasText(annotation.hookUrl()) ? annotation.hookUrl() : defaultSlackWebhookUrl;
+            String msg = isExceptionOccurred
+                ? "["+ exception.getClass().getSimpleName() + "] " + (StringUtils.hasText(annotation.onFailure()) ? annotation.onFailure() : exception.getMessage())
+                : (StringUtils.hasText(annotation.onSuccess())? annotation.onSuccess() : "Success Alert");
+
+            long executionTime = System.currentTimeMillis() - startTime;
+
+            // Auth user 가져오기
+            AuthUser auth = null;
+            JwtAuthenticationToken authentication = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            auth = authentication == null ? null : (AuthUser) authentication.getPrincipal();
+
+            String authInfo = auth == null
+                ? "NO AUTH"
+                : "{ "+MessageFormat.format("Id: {0} || Email: {1} || ROLE: {2}" ,auth.getUserId(), auth.getEmail(), Arrays.toString(auth.getAuthorities().toArray())) + " }";
+
+            String payload = MessageFormat.format(
+                "\n"+"""
+                ```
+                🔔 [Slack Alert] 🔔
+                *────────────────────────────────────────────────────────*
+                👤 Auth: {0}
+                📌 Method: {1}
+                ✉️ Message: {2}
+                {6} Result: {3}
+                ⏳ ExecutionTime: {4}ms
+                🕒 Timestamp: {5}
+                *────────────────────────────────────────────────────────*```
+                """ +"\n",
+                authInfo,
+                joinPoint.getSignature().toShortString(),
+                msg,
+                isExceptionOccurred ? "FAILED" : "SUCCESS",
+                executionTime,
+                LocalDateTime.now().toString(),
+                isExceptionOccurred ? "🔴" : "🟢"
+            );
+
+            slackClient.notify(webhookUrl, payload);
+        }
+    }
+}
+```
+</details>
+
+**결과**</br>
+![image](https://github.com/user-attachments/assets/51058bfe-eaac-4443-9dbf-9676db15fd0f)
+
+</div>
+</details>
+
+<details>
 <summary><h3>동시성 제어</h3></summary>
 <div markdown="1">
 
